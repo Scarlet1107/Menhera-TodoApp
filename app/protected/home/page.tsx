@@ -8,7 +8,7 @@ const HomePage = () => {
     "どうして...昨日は楽しかったのに...今日はどうしてこんなに辛いの...？"
   );
   return (
-    <div className="px-4">
+    <div className="px-4 w-full">
       <h1>ここでヘラちゃんを表示するのだ</h1>
       <Button onClick={() => setTest("テストメッセージ")}>テスト</Button>
       <HeraMessage message={test} affection={12} />
