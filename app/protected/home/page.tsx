@@ -1,7 +1,19 @@
-import React from "react";
+"use client";
+import HeraMessage from "@/components/heraMessage";
+import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 
 const HomePage = () => {
-  return <div>ここでヘラちゃんを表示するのだ</div>;
+  const [test, setTest] = useState(
+    "どうして...昨日は楽しかったのに...今日はどうしてこんなに辛いの...？"
+  );
+  return (
+    <div className="px-4">
+      <h1>ここでヘラちゃんを表示するのだ</h1>
+      <Button onClick={() => setTest("テストメッセージ")}>テスト</Button>
+      <HeraMessage message={test} />
+    </div>
+  );
 };
 
 export default HomePage;
