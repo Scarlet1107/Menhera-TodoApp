@@ -12,17 +12,17 @@ interface HeraMessageProps {
 }
 
 const moodColorMap: Record<HeraMood, string> = {
-  最高: "bg-pink-200",
-  普通: "bg-neutral-200",
-  悪い: "bg-yellow-100",
-  非常に悪い: "bg-red-100",
+  最高: "bg-pink-200 dark:bg-pink-900",
+  普通: "bg-neutral-200 dark:bg-neutral-800",
+  悪い: "bg-yellow-100 dark:bg-yellow-900",
+  非常に悪い: "bg-red-100 dark:bg-red-900",
 };
 
 const moodShadowMap: Record<HeraMood, string> = {
-  最高: "shadow-pink-300",
-  普通: "shadow-gray-300",
-  悪い: "shadow-yellow-400",
-  非常に悪い: "shadow-red-400",
+  最高: "shadow-pink-300 dark:shadow-pink-800",
+  普通: "shadow-gray-300 dark:shadow-gray-700",
+  悪い: "shadow-yellow-400 dark:shadow-yellow-700",
+  非常に悪い: "shadow-red-400 dark:shadow-red-800",
 };
 
 const moodFontMap: Record<HeraMood, string> = {
@@ -34,7 +34,7 @@ const moodFontMap: Record<HeraMood, string> = {
 
 const HeraMessage: React.FC<HeraMessageProps> = ({
   message,
-  affection = 50,
+  affection = 70,
   delay = 100,
   shakeIntensity = 3, // 0から10で設定可能
 }) => {
