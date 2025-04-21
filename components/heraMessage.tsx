@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { getHeraMood, HeraMood } from "@/lib/state";
 
 interface HeraMessageProps {
   message: string;
   affection?: number;
   delay?: number;
-  shakeIntensity?: number; // 揺れの強さ：1〜5ぐらいで調整
+  shakeIntensity?: number; // 1〜10くらいまでいけるように
 }
 
 const moodColorMap: Record<HeraMood, string> = {
@@ -25,18 +25,31 @@ const moodShadowMap: Record<HeraMood, string> = {
   非常に悪い: "shadow-red-400",
 };
 
+const moodFontMap: Record<HeraMood, string> = {
+  最高: "font-happy",
+  普通: "font-sans",
+  悪い: "font-angry",
+  非常に悪い: "font-creepy",
+};
+
 const HeraMessage: React.FC<HeraMessageProps> = ({
   message,
   affection = 50,
   delay = 100,
-  shakeIntensity = 2,
+  shakeIntensity = 3, // 0から10で設定可能
 }) => {
   const [displayedText, setDisplayedText] = useState("");
-  const [shakeKey, setShakeKey] = useState(0);
+  const controls = useAnimation();
 
   const mood = getHeraMood(affection);
   const background = moodColorMap[mood];
   const shadow = moodShadowMap[mood];
+  const font = moodFontMap[mood];
+
+  const intensity = Math.max(0, Math.min(shakeIntensity, 10));
+  console.log("intensity", intensity);
+  const offset = intensity * 0.2; // 揺れの強さを調整できる
+  console.log("offset", offset);
 
   useEffect(() => {
     setDisplayedText("");
@@ -50,28 +63,28 @@ const HeraMessage: React.FC<HeraMessageProps> = ({
 
       const char = message.charAt(currentIndex);
       setDisplayedText((prev) => prev + char);
-      setShakeKey(Math.random());
+      if (shakeIntensity > 0) {
+        controls.start({
+          x: [0, -offset, offset, -offset / 2, offset / 2, 0],
+          y: [0, offset / 1.5, -offset / 1.5, offset, -offset, 0],
+          transition: { duration: 0.25, ease: "easeInOut" },
+        });
+      }
+
       currentIndex += 1;
     }, delay);
 
     return () => clearInterval(interval);
   }, [message, delay]);
 
-  const intensity = Math.max(1, Math.min(shakeIntensity, 5)); // clamp
-  const offset = intensity * 1.5;
-
   return (
-    <motion.div
-      key={shakeKey}
-      animate={{
-        x: [0, -offset, offset, -offset / 2, offset / 2, 0],
-        y: [0, offset / 2, -offset / 2, offset, -offset, 0],
-      }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
-      className={`p-4 rounded-xl text-lg font-mono whitespace-pre-wrap transition-all duration-300 ${background} ${shadow} shadow-md`}
+    <div
+      className={`p-4 rounded-xl text-lg whitespace-pre-wrap transition-all duration-300 ${background} ${shadow} ${font} shadow-md`}
     >
-      {displayedText}
-    </motion.div>
+      <motion.span animate={controls} className="inline-block">
+        {displayedText}
+      </motion.span>
+    </div>
   );
 };
 

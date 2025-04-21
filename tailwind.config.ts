@@ -72,6 +72,11 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      fontFamily: {
+        happy: ['"Zen Maru Gothic"', "sans-serif"], // 丸っこい
+        angry: ['"M PLUS Rounded 1c"', "sans-serif"], // 太字ぎみ
+        creepy: ['"DotGothic16"', "monospace"], // ドット風 or ホラー風
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
