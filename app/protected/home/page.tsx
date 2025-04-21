@@ -11,7 +11,7 @@ const HomePage = () => {
     <div className="px-4 w-full">
       <h1>ここでヘラちゃんを表示するのだ</h1>
       <Button onClick={() => setTest("テストメッセージ")}>テスト</Button>
-      <HeraMessage message={test} affection={12} />
+      <HeraMessage message={test} />
     </div>
   );
 };
