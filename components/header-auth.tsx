@@ -1,18 +1,13 @@
 import { signOutAction } from "@/app/actions";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { createClient } from "@/utils/supabase/server";
+import { User } from "@supabase/supabase-js";
+import { ThemeSwitcher } from "./theme-switcher";
 
-export default async function HeaderAuth() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+export default async function HeaderAuth({ user }: { user: User | null }) {
   return user ? (
     <div className="flex items-center gap-4 text-sm">
-      {/* <span>{user.email} さん</span> */}
+      <ThemeSwitcher />
       <form action={signOutAction}>
         <Button type="submit" variant="outline" size="sm">
           ログアウト

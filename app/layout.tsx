@@ -4,6 +4,10 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
+import { BottomNavigation } from "@/components/bottomNavigation";
+import { headers } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
+import Footer from "@/components/footer";
 
 const geistSans = Geist({
   display: "swap",
@@ -12,14 +16,21 @@ const geistSans = Geist({
 
 export const metadata = {
   title: "メンヘラTodoアプリ",
-  description: "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
+  description:
+    "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="ja" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
@@ -36,20 +47,17 @@ export default function RootLayout({
                   <div className="font-semibold text-lg">
                     <Link href={"/"}>メンヘラTodo</Link>
                   </div>
-                  <HeaderAuth />
+                  <HeaderAuth user={user} />
                 </div>
               </nav>
 
               <div className="flex flex-col gap-20 max-w-5xl p-5">
                 {children}
               </div>
-
-              <footer className="w-full text-center text-xs py-8 text-muted-foreground">
-                © {new Date().getFullYear()} メンヘラTodoアプリ
-                <ThemeSwitcher />
-              </footer>
             </div>
+            <Footer />
           </main>
+          {user && <BottomNavigation />}
         </ThemeProvider>
       </body>
     </html>
