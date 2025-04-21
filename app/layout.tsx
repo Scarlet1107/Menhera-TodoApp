@@ -1,13 +1,11 @@
 import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
-import { BottomNavigation } from "@/components/bottomNavigation";
-import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import Footer from "@/components/footer";
+import { MobileNavigation } from "@/components/mobileNavigation";
 
 const geistSans = Geist({
   display: "swap",
@@ -41,23 +39,13 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <main className="min-h-screen flex flex-col items-center">
-            <div className="flex-1 w-full flex flex-col gap-20 items-center">
-              <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-                <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                  <div className="font-semibold text-lg">
-                    <Link href={"/"}>メンヘラTodo</Link>
-                  </div>
-                  <HeaderAuth user={user} />
-                </div>
-              </nav>
-
-              <div className="flex flex-col gap-20 max-w-5xl p-5">
-                {children}
-              </div>
+            <div className="w-full h-14 bg-white shadow-sm flex items-center justify-end mb-4">
+              <HeaderAuth user={user} />
             </div>
+            {children}
             <Footer />
           </main>
-          {user && <BottomNavigation />}
+          {user && <MobileNavigation />}
         </ThemeProvider>
       </body>
     </html>
