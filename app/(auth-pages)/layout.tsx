@@ -8,7 +8,9 @@ export default async function Layout({
 }) {
   // Check if the user is already logged in
   const supabase = await createClient();
-  const user = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (user) {
     redirect("/protected/home");
   }
