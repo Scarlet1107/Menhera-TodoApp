@@ -5,8 +5,10 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-const redirectTo =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://menhera-todo.scarlet7.net";
+const redirectTo = process.env.NEXT_PUBLIC_SITE_URL;
+if (!redirectTo) {
+  throw new Error("NEXT_PUBLIC_SITE_URL is not defined");
+}
 
 export const signUpAction = async (formData: FormData) => {
   const name = formData.get("name")?.toString();
