@@ -5,6 +5,11 @@ import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+const redirectTo = process.env.NEXT_PUBLIC_SITE_URL;
+if (!redirectTo) {
+  throw new Error("NEXT_PUBLIC_SITE_URL is not defined");
+}
+
 export const signUpAction = async (formData: FormData) => {
   const name = formData.get("name")?.toString();
   const email = formData.get("email")?.toString();
@@ -28,7 +33,7 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: redirectTo,
       data: {
         display_name: name,
       },
