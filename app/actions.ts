@@ -2,11 +2,10 @@
 
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-const redirectTo = process.env.NEXT_PUBLIC_SITE_URL;
-if (!redirectTo) {
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+if (!siteUrl) {
   throw new Error("NEXT_PUBLIC_SITE_URL is not defined");
 }
 
@@ -32,7 +31,7 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      emailRedirectTo: redirectTo,
+      emailRedirectTo: `${siteUrl}/sign-in`,
       data: {
         display_name: name,
       },
@@ -71,7 +70,6 @@ export const signInAction = async (formData: FormData) => {
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const supabase = await createClient();
-  const origin = (await headers()).get("origin");
   const callbackUrl = formData.get("callbackUrl")?.toString();
 
   if (!email) {
@@ -83,7 +81,7 @@ export const forgotPasswordAction = async (formData: FormData) => {
   }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?redirect_to=/protected/reset-password`,
+    redirectTo: `${siteUrl}/auth/callback?redirect_to=/protected/reset-password`,
   });
 
   if (error) {
@@ -108,7 +106,6 @@ export const forgotPasswordAction = async (formData: FormData) => {
 
 export const resetPasswordAction = async (formData: FormData) => {
   const supabase = await createClient();
-
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
