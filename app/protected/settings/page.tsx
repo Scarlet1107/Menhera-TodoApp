@@ -1,5 +1,7 @@
 import { signOutAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import React from "react";
 
 const SettingsPage = () => {
@@ -11,6 +13,12 @@ const SettingsPage = () => {
           ログアウト
         </Button>
       </form>
+      {/* いつか実装する。いつか */}
+      <div>
+        <Label>お名前を変更</Label>
+        <Input />
+        <Button>変更</Button>
+      </div>
     </div>
   );
 };
