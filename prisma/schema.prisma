@@ -15,10 +15,28 @@ datasource db {
 }
 
 model Profile {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  /// Supabase Auth の `users.id` に紐づく
+  userId     String   @id
+  affection  Int      @default(70)
+  lastSeenAt DateTime @default(now())
+  lastActive DateTime @default(now())
+  todos      Todo[]
+
+  @@map("profile")
+}
+
+model Todo {
+  /// 各TodoのUUID
+  id          String   @id @default(uuid())
+  /// ユーザーID（auth.users.id）と紐づく
+  userId      String
+  title       String
+  description String?
+  deadline    DateTime
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  profile     Profile  @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("todo")
 }
