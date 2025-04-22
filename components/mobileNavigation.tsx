@@ -14,7 +14,7 @@ const tabs = [
 
 // サーバーコンポーネントで実装したかった;;
 // サーバーコンポーネントだとisActiveがうまく動かない
-export const BottomNavigation = () => {
+export const MobileNavigation = () => {
   const pathname = usePathname();
 
   return (
