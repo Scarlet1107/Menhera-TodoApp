@@ -53,9 +53,7 @@ const HeraMessage: React.FC<HeraMessageProps> = ({
   const font = moodFontMap[mood];
 
   const intensity = Math.max(0, Math.min(shakeIntensity, 10));
-  console.log("intensity", intensity);
   const offset = intensity * 0.2; // 揺れの強さを調整できる
-  console.log("offset", offset);
 
   useEffect(() => {
     setDisplayedText("");
