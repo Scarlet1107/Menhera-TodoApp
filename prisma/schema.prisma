@@ -15,10 +15,25 @@ datasource db {
 }
 
 model Profile {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId     String   @id @map("user_id") @db.Uuid
+  affection  Int      @default(70)
+  lastSeenAt DateTime @default(now()) @map("last_seen_at")
+  lastActive DateTime @default(now()) @map("last_active")
+  todos      Todo[]
+
+  @@map("profile")
+}
+
+model Todo {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  title       String
+  description String?
+  deadline    DateTime
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  profile     Profile  @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("todo")
 }

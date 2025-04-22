@@ -3,6 +3,7 @@
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 if (!siteUrl) {
@@ -27,7 +28,7 @@ export const signUpAction = async (formData: FormData) => {
     return encodedRedirect("error", "/sign-up", "パスワードは必須です。");
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -41,13 +42,19 @@ export const signUpAction = async (formData: FormData) => {
   if (error) {
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
-  } else {
+  } else if (!data.user) {
     return encodedRedirect(
-      "success",
+      "error",
       "/sign-up",
-      "ご登録ありがとうございます！確認用リンクが記載されたメールをご確認ください。"
+      "アカウントを正しく作成できませんでした。開発者にお問い合わせください"
     );
   }
+
+  return encodedRedirect(
+    "success",
+    "/sign-up",
+    "ご登録ありがとうございます！確認用リンクが記載されたメールをご確認ください。"
+  );
 };
 
 export const signInAction = async (formData: FormData) => {
@@ -55,12 +62,12 @@ export const signInAction = async (formData: FormData) => {
   const password = formData.get("password") as string;
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  if (error) {
+  if (error || !data.user) {
     return encodedRedirect("error", "/sign-in", "ログインに失敗しました。");
   }
 
@@ -110,7 +117,7 @@ export const resetPasswordAction = async (formData: FormData) => {
   const confirmPassword = formData.get("confirmPassword") as string;
 
   if (!password || !confirmPassword) {
-    encodedRedirect(
+    return encodedRedirect(
       "error",
       "/protected/reset-password",
       "パスワードと確認用パスワードは必須です。"
@@ -118,7 +125,7 @@ export const resetPasswordAction = async (formData: FormData) => {
   }
 
   if (password !== confirmPassword) {
-    encodedRedirect(
+    return encodedRedirect(
       "error",
       "/protected/reset-password",
       "パスワードが一致しません。"
@@ -130,14 +137,14 @@ export const resetPasswordAction = async (formData: FormData) => {
   });
 
   if (error) {
-    encodedRedirect(
+    return encodedRedirect(
       "error",
       "/protected/reset-password",
       "パスワードの更新に失敗しました。"
     );
   }
 
-  encodedRedirect(
+  return encodedRedirect(
     "success",
     "/protected/reset-password",
     "パスワードが更新されました。"
