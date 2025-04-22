@@ -15,7 +15,6 @@ export const signUpAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
   const supabase = await createClient();
-  const origin = (await headers()).get("origin");
 
   if (!name) {
     return encodedRedirect("error", "/sign-up", "お名前は必須です。");
