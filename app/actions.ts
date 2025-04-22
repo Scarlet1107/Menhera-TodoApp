@@ -10,25 +10,6 @@ if (!siteUrl) {
   throw new Error("NEXT_PUBLIC_SITE_URL is not defined");
 }
 
-const createProfile = async (userId: string) => {
-  // create profile after create account
-  try {
-    await prisma.profile.create({
-      data: {
-        userId: userId,
-      },
-    });
-    return;
-  } catch (error) {
-    console.error(error);
-    return encodedRedirect(
-      "error",
-      "/sign-up",
-      "ユーザープロフィールを正しく作成できませんでした。開発者にお問い合わせください"
-    );
-  }
-};
-
 export const signUpAction = async (formData: FormData) => {
   const name = formData.get("name")?.toString();
   const email = formData.get("email")?.toString();
@@ -68,10 +49,6 @@ export const signUpAction = async (formData: FormData) => {
       "アカウントを正しく作成できませんでした。開発者にお問い合わせください"
     );
   }
-  const profileCreateResult = await createProfile(data.user.id);
-  if (profileCreateResult) {
-    return profileCreateResult;
-  }
 
   return encodedRedirect(
     "success",
@@ -92,20 +69,6 @@ export const signInAction = async (formData: FormData) => {
 
   if (error || !data.user) {
     return encodedRedirect("error", "/sign-in", "ログインに失敗しました。");
-  }
-
-  const profile = await prisma.profile.findUnique({
-    where: {
-      userId: data.user.id,
-    },
-  });
-
-  if (!profile) {
-    const profileCreateResult = await createProfile(data.user.id);
-    console.log(
-      `なぜかログイン時にプロフィールがなかったので作成しました。user email: ${data.user.email}`
-    );
-    return profileCreateResult;
   }
 
   return redirect("/protected/home");
