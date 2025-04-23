@@ -52,13 +52,12 @@ export default async function ProtectedLayout({
     .eq("user_id", user.id)
     .single();
   if (profileError) {
-    console.log("Test2");
     console.log(profileError);
     redirect("/sign-in");
   }
 
   if (!profile) {
-    console.log("Test3");
+    console.log("profile is null: ", profile);
     redirect("/sign-in");
   }
 
