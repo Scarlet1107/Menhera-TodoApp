@@ -30,12 +30,13 @@
     "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.4",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "19.0.2",
     "postcss": "8.4.49",
     "prisma": "^6.6.0",
-    "tailwindcss-animate": "^1.0.7",
+    "tailwind-animate": "^0.2.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }
