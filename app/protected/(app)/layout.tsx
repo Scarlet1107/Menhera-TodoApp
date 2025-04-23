@@ -71,7 +71,12 @@ export default async function ProtectedLayout({
   const delta = computeDelta(eventType);
   const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
-  // 6. Profile を更新（snake_case）
+  // 6. もしnewAffection or profile.affectionが0なら、ユーザーを削除する
+  if ((newAffection === 0 || profile.affection === 0) ) {
+    redirect("/protected/bad-end");
+  }
+
+  // 7. Profile を更新（snake_case）
   const nowDate = new Date();
   await supabase
     .from("profile")
@@ -82,11 +87,11 @@ export default async function ProtectedLayout({
     })
     .eq("user_id", user.id);
 
-  // 7. mood とメッセージ組み立て
+  // 8. mood とメッセージ組み立て
   const mood = getHeraMood(newAffection);
   const message = buildMessage(mood, eventType);
 
-  // 8. Context に流し込み
+  // 9. Context に流し込み
   const status: HeraStatus = {
     affection: newAffection,
     mood,
