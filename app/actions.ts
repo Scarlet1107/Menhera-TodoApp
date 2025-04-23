@@ -3,7 +3,6 @@
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 if (!siteUrl) {
