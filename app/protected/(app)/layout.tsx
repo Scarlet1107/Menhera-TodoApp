@@ -33,6 +33,7 @@ export default async function ProtectedLayout({
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) {
+    console.log("Test1");
     redirect("/sign-in");
   }
 
@@ -50,7 +51,14 @@ export default async function ProtectedLayout({
     )
     .eq("user_id", user.id)
     .single();
-  if (profileError || !profile) {
+  if (profileError) {
+    console.log("Test2");
+    console.log(profileError);
+    redirect("/sign-in");
+  }
+
+  if (!profile) {
+    console.log("Test3");
     redirect("/sign-in");
   }
 
@@ -72,7 +80,7 @@ export default async function ProtectedLayout({
   const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
   // 6. もしnewAffection or profile.affectionが0なら、ユーザーを削除する
-  if ((newAffection === 0 || profile.affection === 0) ) {
+  if (newAffection === 0 || profile.affection === 0) {
     redirect("/protected/bad-end");
   }
 
