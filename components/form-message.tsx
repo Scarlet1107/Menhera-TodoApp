@@ -13,8 +13,7 @@ export function FormMessage({ message }: { message: Message }) {
       )}
       {"error" in message && (
         <div className="text-foreground border-l-2 border-destructive-foreground px-4">
-          <h2 className="text-xl">予期せぬエラーが発生しました</h2>
-          <span className="text-red-500">エラー: {message.error}</span>
+          <h2 className="text-red-500 text-lg">{message.error}</h2>
         </div>
       )}
       {"message" in message && (

@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
-import { getHeraMood, HeraMood } from "@/lib/state";
+import { getHeraMood, getShakeIntensity, HeraMood } from "@/lib/state";
 
 interface HeraMessageProps {
   message: string;
-  affection?: number;
+  affection: number;
   delay?: number;
   shakeIntensity?: number; // 1〜10くらいまでいけるように
 }
@@ -17,7 +17,6 @@ const moodColorMap: Record<HeraMood, string> = {
   普通: "bg-neutral-200 dark:bg-neutral-800",
   悪い: "bg-yellow-100 dark:bg-yellow-900",
   非常に悪い: "bg-red-100 dark:bg-red-900",
-  バッドエンド: "bg-red-200 dark:bg-red-900",
 };
 
 const moodShadowMap: Record<HeraMood, string> = {
@@ -26,7 +25,6 @@ const moodShadowMap: Record<HeraMood, string> = {
   普通: "shadow-gray-300 dark:shadow-gray-700",
   悪い: "shadow-yellow-400 dark:shadow-yellow-700",
   非常に悪い: "shadow-red-400 dark:shadow-red-800",
-  バッドエンド: "shadow-red-500 dark:shadow-red-900",
 };
 
 const moodFontMap: Record<HeraMood, string> = {
@@ -35,17 +33,16 @@ const moodFontMap: Record<HeraMood, string> = {
   普通: "font-sans",
   悪い: "font-angry",
   非常に悪い: "font-creepy",
-  バッドエンド: "font-creepy",
 };
 
 const HeraMessage: React.FC<HeraMessageProps> = ({
   message,
-  affection = 70,
+  affection,
   delay = 100,
-  shakeIntensity = 3, // 0から10で設定可能
 }) => {
   const [displayedText, setDisplayedText] = useState("");
   const controls = useAnimation();
+  const shakeIntensity = getShakeIntensity(affection);
 
   const mood = getHeraMood(affection);
   const background = moodColorMap[mood];
