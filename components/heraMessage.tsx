@@ -34,7 +34,7 @@ const moodFontMap: Record<HeraMood, string> = {
   非常に悪い: "font-creepy",
 };
 
-const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 30 }) => {
+const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 80 }) => {
   const { affection, message } = useHera();
   const [displayedText, setDisplayedText] = useState("");
   const controls = useAnimation();

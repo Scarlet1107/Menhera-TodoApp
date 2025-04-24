@@ -29,21 +29,16 @@ export default async function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 1. Supabase server-side client
   const supabase = await createClient();
-
-  // 2. 認証ユーザー取得
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
   if (authError || !user) redirect("/sign-in");
 
-  // 3. 今日とユーザー作成日の定義
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
   const createdAt = dayjs(user.created_at).tz("Asia/Tokyo");
 
-  // 4. プロフィール取得
   const { data: profile, error: profileError } = await supabase
     .from("profile")
     .select(
@@ -57,12 +52,11 @@ export default async function ProtectedLayout({
     .single();
   if (profileError || !profile) redirect("/sign-in");
 
-  // 5. イベント種別・好感度計算
   const lastSeenAt = profile.lastSeenAt
-    ? dayjs(profile.lastSeenAt).tz("Asia/Tokyo")
+    ? dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo").startOf("day")
     : null;
   const lastActive = profile.lastActive
-    ? dayjs(profile.lastActive).tz("Asia/Tokyo")
+    ? dayjs.utc(profile.lastActive).tz("Asia/Tokyo").startOf("day")
     : null;
 
   const eventType = decideEventType({
@@ -72,35 +66,20 @@ export default async function ProtectedLayout({
     today,
   });
 
-  // 1) 日本時間の“いま”をUTC文字列に
   const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
-
-  // 2) supabase から delete + count を取る
   const { error: delError, count: deletedCount } = await supabase
     .from("todo")
     .delete({ count: "exact" })
     .eq("user_id", user.id)
     .eq("completed", false)
     .lt("deadline", nowUTCforQuery);
+  if (delError) console.error("期限切れTodo削除エラー", delError);
+  const deleteTodoPenalty = (deletedCount ?? 0) * 5;
 
-  if (delError) {
-    console.error("期限切れTodo削除エラー", delError);
-  }
-  const DELETE_TODO_PENALTY_MULTIPLIER = 5;
-  const deleteTodoPenalty =
-    (deletedCount ?? 0) * DELETE_TODO_PENALTY_MULTIPLIER;
-
-  // 好感度の変化量を計算
   const delta = computeDelta(eventType) - deleteTodoPenalty;
   let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
+  if (newAffection === 0) redirect("/protected/bad-end");
 
-  // 4) 好感度がゼロならバッドエンドへ
-  if (newAffection === 0) {
-    redirect("/protected/bad-end");
-  }
-  // --- 期限切れTodo自動削除ロジックここまで ---
-
-  // 7. プロフィール更新
   const nowDate = new Date();
   const { error } = await supabase
     .from("profile")
@@ -110,50 +89,36 @@ export default async function ProtectedLayout({
       last_active: nowDate,
     })
     .eq("user_id", user.id);
-  if (error) {
-    console.error("プロフィール更新エラー", error);
-  }
+  if (error) console.error("プロフィール更新エラー", error);
 
-  // 8. 記念日判定
+  // 記念日判定
   const diffDays = today.diff(createdAt.startOf("day"), "day") + 1;
-  type AnnivType = "week1" | "week2" | "month" | "hundredDays" | "year";
-  interface AnnivInfo {
-    type: AnnivType;
-    value: number;
-  }
-  let annivInfo: AnnivInfo | null = null;
-
-  if (diffDays === 7) {
-    annivInfo = { type: "week1", value: 1 };
-  } else if (diffDays === 14) {
-    annivInfo = { type: "week2", value: 2 };
-  } else if (diffDays % 365 === 0) {
+  let annivInfo = null;
+  if (diffDays === 7) annivInfo = { type: "week1", value: 1 };
+  else if (diffDays === 14) annivInfo = { type: "week2", value: 2 };
+  else if (diffDays % 365 === 0)
     annivInfo = { type: "year", value: diffDays / 365 };
-  } else if (diffDays % 100 === 0) {
+  else if (diffDays % 100 === 0)
     annivInfo = { type: "hundredDays", value: diffDays / 100 };
-  } else {
+  else {
     const monthDiff = today.diff(createdAt.startOf("day"), "month");
     if (
       monthDiff >= 1 &&
       createdAt.date() === today.date() &&
       monthDiff % 12 !== 0
-    ) {
+    )
       annivInfo = { type: "month", value: monthDiff };
-    }
   }
-  const isAnniversary = annivInfo !== null;
+  const isAnniversary = annivInfo !== null && eventType !== "same_day";
 
-  // 9. ベースメッセージ
+  // メッセージ組み立て変数
   const mood = getHeraMood(newAffection);
   const baseMessage = buildMessage(mood, eventType);
-
-  // 10. 各種アクションとメッセージ追記
+  let annivText = "";
   let todoActionText = "";
 
-  if (eventType === "same_day") {
-    // 何もしない
-  } else if (eventType === "one_day_gap") {
-    // 1日ギャップ → Todo 書き換え
+  // ギャップ系アクション
+  if (eventType === "one_day_gap") {
     const { data: todos } = await supabase
       .from("todo")
       .select("id,title")
@@ -171,10 +136,9 @@ export default async function ProtectedLayout({
           description: "私のためにがんばってくれるよね？",
         })
         .eq("id", pick.id);
-      todoActionText = `あとなかなか Todo を進めてくれないから君のTodoを「${newTitle}」に書き換えておいたよ。私のためにがんばってくれる？`;
+      todoActionText = `あとなかなかTodoを進めてくれないから君のTodoを「${newTitle}」に書き換えておいたよ。私のためにがんばってくれる？`;
     }
   } else if (eventType === "multi_day_gap") {
-    // 複数日ギャップ → Todo 削除
     const { data: todos } = await supabase
       .from("todo")
       .select("id")
@@ -185,60 +149,42 @@ export default async function ProtectedLayout({
       todoActionText =
         "それとやること多すぎちゃったかな?なかなか会いに来てくれないからTodo1つ消しちゃったよ。これで毎日来てくれるよね？";
     }
-  } else if (isAnniversary) {
-    const isPositiveAnniv =
+  }
+
+  // 記念日アクション
+  if (isAnniversary) {
+    const isPositive =
       eventType === "continuous_active" || eventType === "continuous_inactive";
-
-    // ネガティブ記念日
-    if (!isPositiveAnniv && annivInfo) {
-      todoActionText =
-        "そういえば今日は記念日だったね…記念日だけ来ればいいと思ってるの？";
-    }
-
-    // ポジティブ記念日
-    if (isPositiveAnniv && annivInfo) {
-      // プリセットからランダム選択して insert
+    if (isPositive) {
       const title =
         ANNIVERSARY_PRESENT_OPTIONS[
           Math.floor(Math.random() * ANNIVERSARY_PRESENT_OPTIONS.length)
         ];
       await supabase.from("todo").insert({
         user_id: user.id,
-        title: title,
+        title,
         description: "私のためにがんばってくれるよね？",
         deadline: dayjs().add(1, "days").toISOString(),
       });
-
-      // テキスト生成
-      switch (annivInfo.type) {
-        case "week1":
-        case "week2":
-          todoActionText = `${annivInfo.value}週間の記念日だね。プレゼントを用意したよ。todoを見てみてね♡`;
-          break;
-        case "month":
-          todoActionText = `${annivInfo.value}ヶ月の記念日だね。プレゼントを用意したよ。todoを見てみてね♡`;
-          break;
-        case "hundredDays":
-          todoActionText = `${annivInfo.value * 100}日記念日だね。プレゼントを用意したよ。todoを見てみてね♡`;
-          break;
-        case "year":
-          todoActionText = `${annivInfo.value}年の記念日だね。プレゼントを用意したよ。todoを見てみてね♡`;
-          break;
-      }
+      annivText =
+        annivInfo!.type === "month"
+          ? `そういえば今日は${annivInfo!.value}ヶ月の記念日だね。プレゼントを用意したよ。todoを見てみてね♡`
+          : annivInfo!.type === "hundredDays"
+            ? `そういえば今日は${annivInfo!.value * 100}日記念日だね。プレゼントを用意したよ。todoを見てみてね♡`
+            : `そういえば今日は${annivInfo!.value}${annivInfo!.type === "year" ? "年" : "週間"}の記念日だね。プレゼントを用意したよ。todoを見てみてね♡`;
+    } else {
+      annivText =
+        "そういえば今日は記念日だったね…記念日だけ来ればいいと思ってるの？";
     }
   }
 
-  // 11. 最終メッセージ組み立て
-  let message = todoActionText
-    ? `${baseMessage}\n\n${todoActionText}`
-    : baseMessage;
-
-  // ─── 期限切れ削除のお知らせを追記 ───
-  if (deletedCount && deletedCount > 0) {
+  // 最終メッセージ組み立て
+  let message = baseMessage;
+  if (annivText) message += `\n\n${annivText}`;
+  if (todoActionText) message += `\n\n${todoActionText}`;
+  if (deletedCount && deletedCount > 0)
     message += `\n\nあと期限切れのTodo${deletedCount}つ消しといたよ。次はちゃんと約束守ってね`;
-  }
 
-  // 12. Context に流し込み
   const status: HeraStatus = {
     affection: newAffection,
     mood,
@@ -249,10 +195,7 @@ export default async function ProtectedLayout({
 
   return (
     <>
-      {/* ① fixed で画面全体を覆う背景層 */}
       <DynamicBackground />
-
-      {/* ② コンテンツ層は relative + z-index で前面に */}
       <div className="relative z-10 min-w-0 w-full">
         <HeraProvider status={status}>{children}</HeraProvider>
       </div>

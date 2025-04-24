@@ -42,7 +42,6 @@ export const EditTodoDialog: React.FC<EditProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // …入力チェックまわりは省略…
 
     setLoading(true);
 
