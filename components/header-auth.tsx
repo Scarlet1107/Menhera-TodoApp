@@ -39,7 +39,7 @@ export default function Header({ user }: Props) {
   const pathname = usePathname();
 
   return (
-    <header className="w-full border-b bg-pink-50 dark:bg-zinc-900 border-pink-200 dark:border-zinc-800 px-4 shadow-sm h-14 flex items-center justify-between">
+    <header className="w-full border-b bg-pink-50/80 dark:bg-stone-800/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between">
       {/* 左側：ロゴやアプリ名 */}
       <Link href="/protected/home" className="text-sm font-bold text-pink-600">
         メンヘラTodo

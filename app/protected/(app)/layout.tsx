@@ -18,6 +18,7 @@ import {
   ANNIVERSARY_PRESENT_OPTIONS,
   ONE_DAY_GAP_REPLACE_OPTIONS,
 } from "@/constants/presents";
+import DynamicBackground from "@/components/dynamicBackground";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -246,5 +247,15 @@ export default async function ProtectedLayout({
     message,
   };
 
-  return <HeraProvider status={status}>{children}</HeraProvider>;
+  return (
+    <>
+      {/* ① fixed で画面全体を覆う背景層 */}
+      <DynamicBackground />
+
+      {/* ② コンテンツ層は relative + z-index で前面に */}
+      <div className="relative z-10 min-w-0 w-full">
+        <HeraProvider status={status}>{children}</HeraProvider>
+      </div>
+    </>
+  );
 }

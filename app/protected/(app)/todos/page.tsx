@@ -56,7 +56,7 @@ export default async function TodosPage() {
   (t: { completed: any }) => t.completed;
 
   return (
-    <div className="p-4 mx-auto w-full max-w-4xl">
+    <div className="p-4 mx-auto min-w-0 w-full max-w-4xl">
       <HeraMessage />
       <CreateTodoDialog userId={userId} />
       <Tabs defaultValue="active" className="mt-4">
