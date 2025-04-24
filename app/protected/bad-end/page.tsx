@@ -1,8 +1,7 @@
 // File: app/protected/bad-end/page.tsx
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "@/utils/supabase/admin";
-import BadEndClient from "./BadEndClient";
+import BadEndClient from "../../../components/deleteAccountDialog";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function BadEndPage() {

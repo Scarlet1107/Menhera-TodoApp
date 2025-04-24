@@ -18,9 +18,11 @@ export type EventType =
 
 export type { HeraMood };
 
-export type TodoRecord = {
+// 型定義
+export type Todo = {
   id: string;
   title: string;
-  description: string | null;
+  description?: string;
   deadline: string;
+  completed: boolean;
 };
