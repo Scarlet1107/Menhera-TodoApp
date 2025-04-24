@@ -74,7 +74,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
           className="
             fixed right-4 bottom-20 
             md:bottom-30 md:right-20 
-            z-50 w-14 h-14 rounded-full 
+            z-50 w-16 h-16 md:w-20 md:h-20 rounded-full 
             bg-pink-400 border-2 border-pink-600 shadow-md 
             hover:bg-pink-500 
             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-300 
@@ -82,7 +82,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
           "
           aria-label="新規タスク"
         >
-          <Edit size={24} />
+          <Edit size={24} className="md:text-3xl" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-sm">
