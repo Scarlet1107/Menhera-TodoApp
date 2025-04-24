@@ -66,6 +66,7 @@ export const CompleteCheckbox: React.FC<Props> = ({
       onCheckedChange={handleCheckboxChange}
       disabled={loading}
       aria-label="完了/未完了切り替え"
+      className="h-7 w-7"
     />
   );
 };

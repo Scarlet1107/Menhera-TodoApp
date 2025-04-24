@@ -51,7 +51,7 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="sm" disabled={loading}>
+        <Button variant="ghost" size="sm" disabled={loading} className="px-0">
           <Trash2 />
         </Button>
       </AlertDialogTrigger>

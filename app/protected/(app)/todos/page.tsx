@@ -65,33 +65,37 @@ export default async function TodosPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {active.length > 0 ? (
               active.map((todo) => (
-                <Card key={todo.id} className="w-full">
+                <Card key={todo.id} className="w-full relative">
                   <CardHeader className="relative">
                     <CardTitle>{todo.title}</CardTitle>
                     <CardDescription>
                       {dayjs.utc(todo.deadline).tz().format("YYYY-MM-DD")}
                     </CardDescription>
-                    <div className="absolute right-2 top-2 flex space-x-1">
-                      <CompleteCheckbox
-                        id={todo.id}
-                        completed={todo.completed}
-                        userId={userId}
-                        updateAffection={updateAffection}
-                      />
-                      <EditTodoDialog
-                        todo={todo}
-                        updateAffection={updateAffection}
-                      />
-                      <DeleteTodoButton
-                        todoId={todo.id}
-                        userId={userId}
-                        updateAffection={updateAffection}
-                      />
-                    </div>
                   </CardHeader>
                   {todo.description && (
                     <CardContent>{todo.description}</CardContent>
                   )}
+                  <div className="absolute bottom-4 right-4">
+                    <CompleteCheckbox
+                      id={todo.id}
+                      completed={todo.completed}
+                      userId={userId}
+                      updateAffection={updateAffection}
+                    />
+                  </div>
+                  <div className="absolute top-4 right-16">
+                    <EditTodoDialog
+                      todo={todo}
+                      updateAffection={updateAffection}
+                    />
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <DeleteTodoButton
+                      todoId={todo.id}
+                      userId={userId}
+                      updateAffection={updateAffection}
+                    />
+                  </div>
                 </Card>
               ))
             ) : (
@@ -113,7 +117,7 @@ export default async function TodosPage() {
                 {todo.description && (
                   <CardContent>{todo.description}</CardContent>
                 )}
-                <div className="absolute top-2 right-2">
+                <div className="absolute bottom-4 right-4">
                   <CompleteCheckbox
                     id={todo.id}
                     completed={todo.completed}

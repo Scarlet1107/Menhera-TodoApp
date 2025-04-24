@@ -63,7 +63,7 @@ export const EditTodoDialog: React.FC<EditProps> = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm">
+        <Button variant="ghost" size="sm" className="px-0">
           <Edit2 />
         </Button>
       </DialogTrigger>
