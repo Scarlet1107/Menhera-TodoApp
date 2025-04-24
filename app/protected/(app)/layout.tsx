@@ -94,9 +94,52 @@ export default async function ProtectedLayout({
     })
     .eq("user_id", user.id);
 
+  // 記念日ロジック
+
+  const diffDays = today.diff(createdAt.startOf("day"), "day") + 1;
+
+  type AnnivType = "week1" | "week2" | "month" | "hundredDays" | "year";
+
+  interface AnnivInfo {
+    type: AnnivType;
+    value: number;
+  }
+
+  let annivInfo: AnnivInfo | null = null;
+
+  // 1週間目／2週間目
+  if (diffDays === 7) {
+    annivInfo = { type: "week1", value: 1 };
+  } else if (diffDays === 14) {
+    annivInfo = { type: "week2", value: 2 };
+
+    // 1年ごと（365日ごと）
+  } else if (diffDays % 365 === 0) {
+    annivInfo = { type: "year", value: diffDays / 365 };
+
+    // 100日ごと
+  } else if (diffDays % 100 === 0) {
+    annivInfo = { type: "hundredDays", value: diffDays / 100 };
+
+    // 毎月（同じ日付）かつ 1ヶ月以上
+  } else {
+    const monthDiff = today.diff(createdAt.startOf("day"), "month");
+    if (
+      monthDiff >= 1 &&
+      createdAt.date() === today.date() &&
+      // 年祝（12ヶ月）は上の year でキャッチ済み
+      monthDiff % 12 !== 0
+    ) {
+      annivInfo = { type: "month", value: monthDiff };
+    }
+  }
+
+  const isAnniversary = annivInfo !== null;
+  // —— 追加終わり ——
+
   // 8. mood とメッセージ組み立て
   const mood = getHeraMood(newAffection);
-  const message = buildMessage(mood, eventType);
+  const message = buildMessage(mood, eventType, isAnniversary, createdAt);
 
   // 9. Context に流し込み
   const status: HeraStatus = {
