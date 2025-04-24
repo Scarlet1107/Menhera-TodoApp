@@ -6,6 +6,7 @@ import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 import Footer from "@/components/footer";
 import { MobileNavigation } from "@/components/mobileNavigation";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   display: "swap",
@@ -47,6 +48,7 @@ export default async function RootLayout({
           </main>
           {user && <MobileNavigation />}
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

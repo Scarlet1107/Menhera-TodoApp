@@ -1,66 +1,28 @@
-// app/protected/bad-end/page.tsx
-"use client";
+// File: app/protected/bad-end/page.tsx
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { supabaseAdmin } from "@/utils/supabase/admin";
+import BadEndClient from "./BadEndClient";
+import { createClient } from "@/utils/supabase/server";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
-} from "@/components/ui/alert-dialog";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { createClient } from "@/utils/supabase/client";
+export default async function BadEndPage() {
+  // サーバーコンポーネントで認証チェック
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    redirect("/sign-in");
+  }
+  const userId = user.id;
 
-export default function BadEndPage() {
-  const router = useRouter();
-  const supabase = createClient();
-  const [open, setOpen] = useState(false);
+  // サーバーアクション: Service Roleキーで削除
+  async function handleDelete() {
+    "use server";
+    await supabaseAdmin.from("todo").delete().eq("user_id", userId);
+    await supabaseAdmin.from("profile").delete().eq("user_id", userId);
+    await supabaseAdmin.auth.admin.deleteUser(userId);
+  }
 
-  // ページロード時に自動でダイアログを開く
-  useEffect(() => {
-    setOpen(true);
-  }, []);
-
-  const handleDelete = async () => {
-    // APIルート経由で一括削除
-    const res = await fetch("/api/profile/delete", { method: "POST" });
-    if (res.ok) {
-      // Supabase Auth セッションも破棄
-      await supabase.auth.signOut();
-      router.push("/sign-in");
-    } else {
-      console.error("削除失敗", await res.text());
-    }
-  };
-
-  return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>……もう君はいらないの？</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="flex flex-col items-center space-y-4">
-              {/* <Image
-                src="/hera-bad-end.png"
-                width={200}
-                height={200}
-                alt="壊れたヘラちゃん"
-              /> */}
-              <p>ここに画像を表示</p>
-              <p>ずっと待ってたのに……また来ないなら、消えちゃうよ？</p>
-            </div>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Button variant="destructive" onClick={handleDelete}>
-            アカウントを消去する
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
+  return <BadEndClient action={handleDelete} />;
 }
