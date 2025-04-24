@@ -21,9 +21,18 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-type Props = { userId: string };
+/**
+ * Props
+ */
+export type CreateTodoDialogProps = {
+  userId: string;
+  updateAffection: (userId: string, delta: number) => Promise<void>;
+};
 
-export const CreateTodoDialog: React.FC<Props> = ({ userId }) => {
+export const CreateTodoDialog: React.FC<CreateTodoDialogProps> = ({
+  userId,
+  updateAffection,
+}) => {
   const [open, setOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
@@ -36,7 +45,7 @@ export const CreateTodoDialog: React.FC<Props> = ({ userId }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 過去日付のチェック
+    // 過去日の選択を再チェック
     if (date < today) {
       toast.error("過去の日付は選択できません");
       return;
@@ -57,7 +66,9 @@ export const CreateTodoDialog: React.FC<Props> = ({ userId }) => {
     if (error) {
       toast.error("タスクの作成に失敗しました");
     } else {
-      toast.success("タスクを作成しました");
+      // 好感度 +1
+      await updateAffection(userId, 1);
+      toast.success("タスクを作成しました。好感度 +1");
       setOpen(false);
       router.refresh();
     }

@@ -15,8 +15,8 @@ import { Todo } from "@/lib/hera/types";
 import { CompleteCheckbox } from "@/components/completeCheckbox";
 import { CreateTodoDialog } from "@/components/CreateTodoDialog";
 import { redirect } from "next/navigation";
+import { updateAffection } from "./actions";
 
-// dayjs の isBetween プラグイン有効化
 dayjs.extend(isBetween);
 
 export default async function TodosPage() {
@@ -24,9 +24,7 @@ export default async function TodosPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    redirect("/sign-in");
-  }
+  if (!user) redirect("/sign-in");
   const userId = user.id;
 
   const { data: todos, error } = await supabase
@@ -34,9 +32,8 @@ export default async function TodosPage() {
     .select("id, title, description, deadline, completed")
     .order("deadline", { ascending: true });
 
-  if (error) {
+  if (error)
     return <div className="p-4 text-red-500">エラー: {error.message}</div>;
-  }
 
   const list: Todo[] = todos ?? [];
   const todayStart = dayjs().startOf("day");
@@ -81,7 +78,10 @@ export default async function TodosPage() {
                       <CardContent>{todo.description}</CardContent>
                     )}
                     <div className="absolute top-2 right-2">
-                      <CompleteCheckbox id={todo.id} completed={todo.completed} />
+                      <CompleteCheckbox
+                        id={todo.id}
+                        completed={todo.completed}
+                      />
                     </div>
                   </Card>
                 ))}
@@ -131,8 +131,8 @@ export default async function TodosPage() {
           )}
         </TabsContent>
       </Tabs>
-      <CreateTodoDialog userId={userId} />
+      {/* 好感度更新アクションを渡す */}
+      <CreateTodoDialog userId={userId} updateAffection={updateAffection} />
     </div>
   );
 }
-
