@@ -6,12 +6,12 @@ const Debugger = () => {
   const { affection, delta, mood, event, message } = useHera();
 
   return (
-    <div className="hera-status mt-3 text-sm text-gray-600">
-      <span>好感度: {affection}</span>
-      <span>ムード: {mood}</span>
-      <span className="ml-4">イベント: {event}</span>
-      <span className="ml-4">変化量 (delta): {delta}</span>
-      <span className="ml-4">メッセージ: {message}</span>
+    <div className="hera-status mt-3 text-sm text-black bg-white z-50">
+      <p>好感度: {affection}</p>
+      <p>ムード: {mood}</p>
+      <p className="ml-4">イベント: {event}</p>
+      <p className="ml-4">変化量 (delta): {delta}</p>
+      {/* <p className="ml-4">メッセージ: {message}</p> */}
     </div>
   );
 };

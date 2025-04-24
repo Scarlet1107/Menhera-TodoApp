@@ -29,6 +29,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
   const supabase = createClient();
   const router = useRouter();
   const today = new Date().toISOString().slice(0, 10);
+  const todayLocal = new Date().toLocaleDateString("en-CA");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<string>(today);
@@ -116,7 +117,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
               id="date"
               type="date"
               value={date}
-              min={today}
+              min={todayLocal}
               onChange={(e) => setDate(e.target.value)}
               required
             />

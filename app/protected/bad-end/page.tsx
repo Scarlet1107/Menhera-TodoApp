@@ -15,6 +15,18 @@ export default async function BadEndPage() {
   }
   const userId = user.id;
 
+  const { data, error } = await supabase
+    .from("profile")
+    .select("affection")
+    .eq("user_id", userId);
+  if (error || !data || data.length === 0) {
+    redirect("/protected/home");
+  }
+  const affection = data[0].affection;
+  if (affection > 0) {
+    redirect("/protected/home");
+  }
+
   // サーバーアクション: Service Roleキーで削除
   async function handleDelete() {
     "use server";
@@ -24,4 +36,7 @@ export default async function BadEndPage() {
   }
 
   return <BadEndClient action={handleDelete} />;
+}
+function single() {
+  throw new Error("Function not implemented.");
 }

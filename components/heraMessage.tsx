@@ -11,11 +11,11 @@ interface HeraMessageProps {
 }
 
 const moodColorMap: Record<HeraMood, string> = {
-  最高: "bg-pink-50 dark:bg-pink-500", // もっとも明るいピンク
-  良い: "bg-pink-100 dark:bg-pink-700", // 少し抑えたピンク
-  普通: "bg-stone-100 dark:bg-stone-700", // ニュートラルな薄石色
-  悪い: "bg-stone-200 dark:bg-stone-800", // くすんだ石色
-  非常に悪い: "bg-black/10 dark:bg-white/10", // ほぼ黒（暗モード時はほぼ白）
+  最高: "bg-pink-50 dark:bg-pink-500",
+  良い: "bg-pink-100 dark:bg-pink-700",
+  普通: "bg-stone-100 dark:bg-stone-700",
+  悪い: "bg-stone-200 dark:bg-stone-800",
+  非常に悪い: "bg-black/90 dark:bg-red-800",
 };
 
 const moodShadowMap: Record<HeraMood, string> = {

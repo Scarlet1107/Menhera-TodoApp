@@ -31,7 +31,7 @@ const HomePage = async () => {
       <HeraMainImage />
       <CreateTodoDialog userId={userId} />
       {/* いずれ消す */}
-      {/* <Debugger /> */}
+      <Debugger />
     </div>
   );
 };
