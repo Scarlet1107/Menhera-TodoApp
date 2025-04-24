@@ -17,3 +17,10 @@ export type EventType =
   | "over_100_day_gap"; // 100日以上空けた
 
 export type { HeraMood };
+
+export type TodoRecord = {
+  id: string;
+  title: string;
+  description: string | null;
+  deadline: string;
+};

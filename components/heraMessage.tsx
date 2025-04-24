@@ -38,7 +38,7 @@ const moodFontMap: Record<HeraMood, string> = {
 const HeraMessage: React.FC<HeraMessageProps> = ({
   message,
   affection,
-  delay = 100,
+  delay = 30,
 }) => {
   const [displayedText, setDisplayedText] = useState("");
   const controls = useAnimation();

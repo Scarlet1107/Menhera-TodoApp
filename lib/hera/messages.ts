@@ -1,7 +1,6 @@
 // lib/hera/messages.ts
 import { HeraMood } from "@/lib/state";
 import { EventType } from "./types";
-import dayjs, { Dayjs } from "dayjs";
 
 export const FIRST_LOGIN_MESSAGE =
   "はじめまして…ヘラちゃんだよ。これからずっと一緒に頑張ろうね";
@@ -55,7 +54,7 @@ export const messages: Record<HeraMood, Partial<Record<EventType, string>>> = {
   },
 
   非常に悪い: {
-    same_day: "今日も来た…暇なの？",
+    same_day: "今日も来た…暇なの",
     continuous_active: "毎日？…もう勘弁してほしい。",
     continuous_inactive: "昨日来ない？…勝手にしてて。",
     one_day_gap: "1日…やっと静かになった。",
@@ -66,49 +65,12 @@ export const messages: Record<HeraMood, Partial<Record<EventType, string>>> = {
   },
 };
 
-/**
- * メッセージ組み立て
- * @param mood          ヘラちゃんの機嫌
- * @param eventType     イベント種別
- * @param isAnniv       今日が記念日なら true
- * @param createdAt     ユーザー登録日時 (Dayjs)
- */
-export function buildMessage(
-  mood: HeraMood,
-  eventType: EventType,
-  isAnniv = false,
-  createdAt?: Dayjs
-): string {
-  // まず既存のベースメッセージを取得
-  const base = messages[mood]?.[eventType] ?? "";
-
-  // 記念日判定は same_day を除外
-  if (!isAnniv || eventType === "same_day" || !createdAt) {
-    return base;
+export function buildMessage(mood: HeraMood, event: EventType): string {
+  if (event === "first_login") {
+    return FIRST_LOGIN_MESSAGE;
   }
-
-  // 今日―登録日 何日目 or 何周年かを算出
-  const today = dayjs().tz("Asia/Tokyo").startOf("day");
-  const diffDays = today.diff(createdAt.startOf("day"), "day") + 1;
-  const annivText =
-    diffDays % 365 === 0 ? `${diffDays / 365}周年` : `${diffDays}日目`;
-
-  // ポジティブな記念日イベント
-  const positiveEvents: EventType[] = [
-    "continuous_active",
-    "continuous_inactive",
-  ];
-
-  if (positiveEvents.includes(eventType)) {
-    return (
-      base +
-      ` そういえば今日で${annivText}の記念日だね。プレゼントを用意したよ🎁`
-    );
+  if (mood in messages) {
+    return messages[mood]?.[event] ?? FIRST_LOGIN_MESSAGE;
   }
-
-  // それ以外はネガティブ寄り
-  return (
-    base +
-    ` 今日で${annivText}の記念日だったね…記念日だけ来ればいいと思ってる？`
-  );
+  return FIRST_LOGIN_MESSAGE;
 }
