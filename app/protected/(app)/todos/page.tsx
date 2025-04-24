@@ -20,6 +20,8 @@ import type { Todo } from "@/lib/hera/types";
 import { CompleteCheckbox } from "@/components/completeCheckbox";
 import { EditTodoDialog } from "@/components/ui/editTodoDialog";
 import { DeleteTodoButton } from "@/components/deleteTodoButton";
+import HeraMessage from "@/components/heraMessage";
+import { AffectionBadge } from "@/components/affectionBadge";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -55,7 +57,8 @@ export default async function TodosPage() {
 
   return (
     <div className="p-4 mx-auto w-full max-w-4xl">
-      <CreateTodoDialog userId={userId} updateAffection={updateAffection} />
+      <HeraMessage />
+      <CreateTodoDialog userId={userId} />
       <Tabs defaultValue="active" className="mt-4">
         <TabsList className="w-full max-w-3xl mx-auto">
           <TabsTrigger value="active">未完了</TabsTrigger>

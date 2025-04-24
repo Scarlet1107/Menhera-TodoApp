@@ -185,7 +185,6 @@ export default async function ProtectedLayout({
         "それとやること多すぎちゃったかな?なかなか会いに来てくれないからTodo1つ消しちゃったよ。これで毎日来てくれるよね？";
     }
   } else if (isAnniversary) {
-    // anniversary & not same_day & not gap
     const isPositiveAnniv =
       eventType === "continuous_active" || eventType === "continuous_inactive";
 
