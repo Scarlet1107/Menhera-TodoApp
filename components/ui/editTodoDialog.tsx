@@ -21,6 +21,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Todo } from "@/lib/hera/types";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
+import { useHera } from "@/lib/hera/context";
+import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 
 type EditProps = { todo: Todo; updateAffection: UpdateAffectionFn };
 export const EditTodoDialog: React.FC<EditProps> = ({
@@ -36,27 +38,53 @@ export const EditTodoDialog: React.FC<EditProps> = ({
   const [description, setDescription] = useState(todo.description || "");
   const [date, setDate] = useState<string>(d0);
   const [loading, setLoading] = useState(false);
+  const { affection, setHeraStatus } = useHera();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (date < today) {
-      toast.error("過去日は不可");
-      return;
-    }
+    // …入力チェックまわりは省略…
+
     setLoading(true);
+
+    // フォームの date 文字列から日付を生成
     const [y, m, d] = date.split("-").map(Number);
-    const deadline = new Date(y, m - 1, d, 23, 59, 59);
+    const newDeadline = new Date(y, m - 1, d, 23, 59, 59);
+
+    const originalDateOnly = todo.deadline.slice(0, 10);
+    const newDateOnly = date;
+
+    // DB 更新
     const { error } = await supabase
       .from("todo")
-      .update({ title, description: description || null, deadline })
+      .update({
+        title,
+        description: description || null,
+        deadline: newDeadline,
+      })
       .eq("id", todo.id);
-    if (error) toast.error("更新失敗");
-    else {
-      await updateAffection(todo.user_id, -3);
-      toast.success("タスクを更新しました。好感度 -3");
+
+    if (error) {
+      toast.error("更新失敗");
+    } else {
+      // 締切を延ばしたときだけペナルティ
+      const isExtended = newDateOnly > originalDateOnly;
+      if (isExtended) {
+        const delta = -3;
+        await updateAffection(todo.user_id, delta);
+        const msg = getActionMessage("edit" as HeraAction, affection);
+        setHeraStatus({
+          affection: affection + delta,
+          delta: delta,
+          message: msg,
+        });
+      } else {
+        toast.success("タスクを更新しました");
+      }
+
       setOpen(false);
       router.refresh();
     }
+
     setLoading(false);
   };
 

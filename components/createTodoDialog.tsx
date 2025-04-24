@@ -19,13 +19,14 @@ import { Edit } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
-
-type CreateProps = { userId: string; updateAffection: UpdateAffectionFn };
-export const CreateTodoDialog: React.FC<CreateProps> = ({
-  userId,
+import {
   updateAffection,
-}) => {
+} from "@/app/protected/(app)/todos/actions";
+import { useHera } from "@/lib/hera/context";
+import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
+
+type CreateProps = { userId: string };
+export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
   const [open, setOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
@@ -34,6 +35,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<string>(today);
   const [loading, setLoading] = useState(false);
+  const { affection, setHeraStatus } = useHera();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +55,14 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({
     });
     if (error) toast.error("タスク作成に失敗");
     else {
-      await updateAffection(userId, 1);
-      toast.success("タスクを作成しました。好感度 +1");
+      const delta = 1;
+      await updateAffection(userId, delta);
+      const message = getActionMessage("create" as HeraAction, affection);
+      setHeraStatus({
+        affection: affection + delta,
+        delta: delta,
+        message: message,
+      });
       setOpen(false);
       router.refresh();
     }
@@ -65,7 +73,15 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="fixed right-4 bottom-20 md:top-6 md:right-6 z-50 w-14 h-14 rounded-full bg-pink-400 text-white"
+          className="
+            fixed right-4 bottom-20 
+            md:bottom-30 md:right-20 
+            z-50 w-14 h-14 rounded-full 
+            bg-pink-400 border-2 border-pink-600 shadow-md 
+            hover:bg-pink-500 
+            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-300 
+            transition-all duration-200 ease-in-out
+          "
           aria-label="新規タスク"
         >
           <Edit size={24} />

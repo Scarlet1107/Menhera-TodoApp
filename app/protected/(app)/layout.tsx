@@ -70,17 +70,38 @@ export default async function ProtectedLayout({
     lastActive,
     today,
   });
-  const delta = computeDelta(eventType);
-  const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
-  // 6. 好感度ゼロならバッドエンド
-  if (newAffection === 0 || profile.affection === 0) {
+  // 1) 日本時間の“いま”をUTC文字列に
+  const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
+
+  // 2) supabase から delete + count を取る
+  const { error: delError, count: deletedCount } = await supabase
+    .from("todo")
+    .delete({ count: "exact" })
+    .eq("user_id", user.id)
+    .eq("completed", false)
+    .lt("deadline", nowUTCforQuery);
+
+  if (delError) {
+    console.error("期限切れTodo削除エラー", delError);
+  }
+  const DELETE_TODO_PENALTY_MULTIPLIER = 5;
+  const deleteTodoPenalty =
+    (deletedCount ?? 0) * DELETE_TODO_PENALTY_MULTIPLIER;
+
+  // 好感度の変化量を計算
+  const delta = computeDelta(eventType) - deleteTodoPenalty;
+  let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
+
+  // 4) 好感度がゼロならバッドエンドへ
+  if (newAffection === 0) {
     redirect("/protected/bad-end");
   }
+  // --- 期限切れTodo自動削除ロジックここまで ---
 
   // 7. プロフィール更新
   const nowDate = new Date();
-  await supabase
+  const { error } = await supabase
     .from("profile")
     .update({
       affection: newAffection,
@@ -88,6 +109,9 @@ export default async function ProtectedLayout({
       last_active: nowDate,
     })
     .eq("user_id", user.id);
+  if (error) {
+    console.error("プロフィール更新エラー", error);
+  }
 
   // 8. 記念日判定
   const diffDays = today.diff(createdAt.startOf("day"), "day") + 1;
@@ -161,7 +185,6 @@ export default async function ProtectedLayout({
         "それとやること多すぎちゃったかな?なかなか会いに来てくれないからTodo1つ消しちゃったよ。これで毎日来てくれるよね？";
     }
   } else if (isAnniversary) {
-    // anniversary & not same_day & not gap
     const isPositiveAnniv =
       eventType === "continuous_active" || eventType === "continuous_inactive";
 
@@ -205,15 +228,21 @@ export default async function ProtectedLayout({
   }
 
   // 11. 最終メッセージ組み立て
-  const message = todoActionText
+  let message = todoActionText
     ? `${baseMessage}\n\n${todoActionText}`
     : baseMessage;
+
+  // ─── 期限切れ削除のお知らせを追記 ───
+  if (deletedCount && deletedCount > 0) {
+    message += `\n\nあと期限切れのTodo${deletedCount}つ消しといたよ。次はちゃんと約束守ってね`;
+  }
 
   // 12. Context に流し込み
   const status: HeraStatus = {
     affection: newAffection,
     mood,
     event: eventType,
+    delta,
     message,
   };
 

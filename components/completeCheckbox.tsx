@@ -8,6 +8,8 @@ import type { Todo } from "@/lib/hera/types";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
+import { useHera } from "@/lib/hera/context";
+import { getActionMessage } from "@/lib/hera/actionMessage";
 
 interface Props {
   id: Todo["id"];
@@ -26,6 +28,7 @@ export const CompleteCheckbox: React.FC<Props> = ({
   const router = useRouter();
   const [checked, setChecked] = useState<boolean>(completed);
   const [loading, setLoading] = useState<boolean>(false);
+  const { affection, setHeraStatus } = useHera();
 
   const handleCheckboxChange = async (newChecked: boolean) => {
     // Optimistic UI update
@@ -47,11 +50,12 @@ export const CompleteCheckbox: React.FC<Props> = ({
       // 好感度更新 (+3 or -4)
       const delta = newChecked ? 3 : -4;
       await updateAffection(userId, delta);
-      toast.success(
-        `タスクを${newChecked ? "完了" : "未完了"}にしました。好感度 ${
-          delta > 0 ? "+" : ""
-        }${delta}`
-      );
+      const msg = getActionMessage("complete", affection + delta);
+      setHeraStatus({
+        affection: affection + delta,
+        delta: delta,
+        message: msg,
+      });
       // ページ再取得
       router.refresh();
     }

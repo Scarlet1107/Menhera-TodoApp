@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
+import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
+import { useHera } from "@/lib/hera/context";
 
 // Props for deletion button
 export type DeleteTodoProps = {
@@ -34,6 +36,7 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
   const router = useRouter();
+  const { affection, setHeraStatus } = useHera();
 
   const handleDelete = async () => {
     setLoading(true);
@@ -41,8 +44,14 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
     if (error) {
       toast.error("削除に失敗しました");
     } else {
-      await updateAffection(userId, -5);
-      toast.warning("タスクを削除しました。好感度 -5");
+      const delta = -5;
+      await updateAffection(userId, delta);
+      const msg = getActionMessage("delete" as HeraAction, affection);
+      setHeraStatus({
+        affection: affection + delta,
+        delta: delta,
+        message: msg,
+      });
       router.refresh();
     }
     setLoading(false);

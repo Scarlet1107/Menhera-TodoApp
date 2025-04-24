@@ -1,31 +1,43 @@
 // lib/hera/context.tsx
 "use client";
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useState } from "react";
 import { HeraMood } from "@/lib/state";
 import { EventType } from "@/lib/hera/types";
 
-/**
- * API で返却されるヘラちゃんステータス型
- */
 export interface HeraStatus {
   affection: number;
+  delta: number;
   mood: HeraMood;
   event: EventType;
   message: string;
 }
 
-// Context と Provider
-const HeraContext = createContext<HeraStatus | null>(null);
+export interface HeraContextValue extends HeraStatus {
+  setHeraStatus: (updater: Partial<HeraStatus>) => void;
+}
+
+const HeraContext = createContext<HeraContextValue | null>(null);
+
 export const HeraProvider = ({
-  status,
+  status: initialStatus,
   children,
 }: {
   status: HeraStatus;
   children: ReactNode;
-}) => <HeraContext.Provider value={status}>{children}</HeraContext.Provider>;
+}) => {
+  const [heraStatus, setHeraStatusState] = useState<HeraStatus>(initialStatus);
 
-// フック
-export function useHera(): HeraStatus {
+  const setHeraStatus = (updater: Partial<HeraStatus>) =>
+    setHeraStatusState((prev) => ({ ...prev, ...updater }));
+
+  return (
+    <HeraContext.Provider value={{ ...heraStatus, setHeraStatus }}>
+      {children}
+    </HeraContext.Provider>
+  );
+};
+
+export function useHera(): HeraContextValue {
   const ctx = useContext(HeraContext);
   if (!ctx) throw new Error("useHera() must be used within HeraProvider");
   return ctx;

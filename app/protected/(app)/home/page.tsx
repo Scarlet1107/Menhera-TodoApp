@@ -1,24 +1,32 @@
-"use client";
+import React from "react";
 import HeraMessage from "@/components/heraMessage";
-import { Button } from "@/components/ui/button";
+import { AffectionBadge } from "@/components/affectionBadge";
 import { useHera } from "@/lib/hera/context";
-import React, { useState } from "react";
+import { CreateTodoDialog } from "@/components/createTodoDialog";
+import { createClient } from "@/utils/supabase/server";
+import Debugger from "@/components/debugger";
 
-const HomePage = () => {
-  const { affection, mood, event, message } = useHera();
+const HomePage = async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return (
+      <div className="p-4 text-red-500">エラー: ユーザーが見つかりません</div>
+    );
+  }
+  const userId = user.id;
 
   return (
     <div className="px-4 w-full">
-      <h1 className="text-2xl">ここでヘラちゃんを表示するのだ</h1>
-      <HeraMessage message={message} affection={affection} />
+      {/* ヘラちゃんのメッセージ部分 */}
+      <HeraMessage />
 
-      <div className="p-4">
-        <div className="hera-status mt-3 text-sm text-gray-600">
-          <span>好感度: {affection}</span>
-          <span className="ml-4">ムード: {mood}</span>
-          <span className="ml-4">イベント: {event}</span>
-        </div>
-      </div>
+      <AffectionBadge />
+      <CreateTodoDialog userId={userId} />
+      {/* いずれ消す */}
+      <Debugger />
     </div>
   );
 };
