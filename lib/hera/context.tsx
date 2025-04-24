@@ -8,14 +8,15 @@ import { EventType } from "@/lib/hera/types";
  * API で返却されるヘラちゃんステータス型
  */
 export interface HeraStatus {
-  affection: number;
+  affection: number; // 今の好感度
+  delta: number; // 今回変化した好感度（例：+3 → 3）
   mood: HeraMood;
   event: EventType;
   message: string;
 }
 
-// Context と Provider
 const HeraContext = createContext<HeraStatus | null>(null);
+
 export const HeraProvider = ({
   status,
   children,
@@ -24,7 +25,6 @@ export const HeraProvider = ({
   children: ReactNode;
 }) => <HeraContext.Provider value={status}>{children}</HeraContext.Provider>;
 
-// フック
 export function useHera(): HeraStatus {
   const ctx = useContext(HeraContext);
   if (!ctx) throw new Error("useHera() must be used within HeraProvider");

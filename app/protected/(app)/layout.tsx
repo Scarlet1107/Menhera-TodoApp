@@ -70,31 +70,28 @@ export default async function ProtectedLayout({
     lastActive,
     today,
   });
-  let newAffection = Math.max(
-    0,
-    Math.min(100, profile.affection + computeDelta(eventType))
-  );
 
-  // --- 期限切れTodo自動削除ロジックの追加ここから ---
   // 1) 日本時間の“いま”をUTC文字列に
   const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
 
-  // 2) supabase から一発で delete + count を取る
+  // 2) supabase から delete + count を取る
   const { error: delError, count: deletedCount } = await supabase
     .from("todo")
     .delete({ count: "exact" })
     .eq("user_id", user.id)
+    .eq("completed", false)
     .lt("deadline", nowUTCforQuery);
 
   if (delError) {
     console.error("期限切れTodo削除エラー", delError);
-  } else if (!deletedCount) {
-    // 2) 削除なし
-    console.log("期限切れTodo削除なし");
-  } else if (deletedCount > 0) {
-    // 3) 削除ペナルティ
-    newAffection = Math.max(0, newAffection - deletedCount * 5);
   }
+  const DELETE_TODO_PENALTY_MULTIPLIER = 5;
+  const deleteTodoPenalty =
+    (deletedCount ?? 0) * DELETE_TODO_PENALTY_MULTIPLIER;
+
+  // 好感度の変化量を計算
+  const delta = computeDelta(eventType) - deleteTodoPenalty;
+  let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
   // 4) 好感度がゼロならバッドエンドへ
   if (newAffection === 0) {
@@ -104,7 +101,7 @@ export default async function ProtectedLayout({
 
   // 7. プロフィール更新
   const nowDate = new Date();
-  await supabase
+  const { error } = await supabase
     .from("profile")
     .update({
       affection: newAffection,
@@ -112,6 +109,9 @@ export default async function ProtectedLayout({
       last_active: nowDate,
     })
     .eq("user_id", user.id);
+  if (error) {
+    console.error("プロフィール更新エラー", error);
+  }
 
   // 8. 記念日判定
   const diffDays = today.diff(createdAt.startOf("day"), "day") + 1;
@@ -243,6 +243,7 @@ export default async function ProtectedLayout({
     affection: newAffection,
     mood,
     event: eventType,
+    delta,
     message,
   };
 
