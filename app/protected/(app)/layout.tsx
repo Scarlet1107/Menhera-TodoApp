@@ -70,13 +70,37 @@ export default async function ProtectedLayout({
     lastActive,
     today,
   });
-  const delta = computeDelta(eventType);
-  const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
+  let newAffection = Math.max(
+    0,
+    Math.min(100, profile.affection + computeDelta(eventType))
+  );
 
-  // 6. 好感度ゼロならバッドエンド
-  if (newAffection === 0 || profile.affection === 0) {
+  // --- 期限切れTodo自動削除ロジックの追加ここから ---
+  // 1) 日本時間の“いま”をUTC文字列に
+  const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
+
+  // 2) supabase から一発で delete + count を取る
+  const { error: delError, count: deletedCount } = await supabase
+    .from("todo")
+    .delete({ count: "exact" })
+    .eq("user_id", user.id)
+    .lt("deadline", nowUTCforQuery);
+
+  if (delError) {
+    console.error("期限切れTodo削除エラー", delError);
+  } else if (!deletedCount) {
+    // 2) 削除なし
+    console.log("期限切れTodo削除なし");
+  } else if (deletedCount > 0) {
+    // 3) 削除ペナルティ
+    newAffection = Math.max(0, newAffection - deletedCount * 5);
+  }
+
+  // 4) 好感度がゼロならバッドエンドへ
+  if (newAffection === 0) {
     redirect("/protected/bad-end");
   }
+  // --- 期限切れTodo自動削除ロジックここまで ---
 
   // 7. プロフィール更新
   const nowDate = new Date();
@@ -205,9 +229,14 @@ export default async function ProtectedLayout({
   }
 
   // 11. 最終メッセージ組み立て
-  const message = todoActionText
+  let message = todoActionText
     ? `${baseMessage}\n\n${todoActionText}`
     : baseMessage;
+
+  // ─── 期限切れ削除のお知らせを追記 ───
+  if (deletedCount && deletedCount > 0) {
+    message += `\n\nあと期限切れのTodo${deletedCount}つ消しといたよ。次はちゃんと約束守ってね`;
+  }
 
   // 12. Context に流し込み
   const status: HeraStatus = {
