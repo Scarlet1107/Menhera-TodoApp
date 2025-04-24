@@ -18,7 +18,7 @@ export const MobileNavigation = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/50 border-t border-gray-200 shadow-md sm:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-pink-50/70 border-pink-200 dark:bg-white/50 border-t dark:border-gray-200 shadow-md sm:hidden">
       <ul className="flex justify-around items-center p-2 ">
         {tabs.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href;

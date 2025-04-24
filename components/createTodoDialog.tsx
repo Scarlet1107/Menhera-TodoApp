@@ -19,9 +19,7 @@ import { Edit } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import {
-  updateAffection,
-} from "@/app/protected/(app)/todos/actions";
+import { updateAffection } from "@/app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 
@@ -80,7 +78,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
             bg-pink-400 border-2 border-pink-600 shadow-md 
             hover:bg-pink-500 
             focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-300 
-            transition-all duration-200 ease-in-out
+            transition-all duration-200 ease-in-out dark:text-white/90
           "
           aria-label="新規タスク"
         >
