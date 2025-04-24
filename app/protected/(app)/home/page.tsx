@@ -5,6 +5,7 @@ import { useHera } from "@/lib/hera/context";
 import { CreateTodoDialog } from "@/components/createTodoDialog";
 import { createClient } from "@/utils/supabase/server";
 import Debugger from "@/components/debugger";
+import HeraMainImage from "@/components/heraMainImage";
 
 const HomePage = async () => {
   const supabase = await createClient();
@@ -19,14 +20,18 @@ const HomePage = async () => {
   const userId = user.id;
 
   return (
-    <div className="px-4 w-full">
+    <div className="relative w-full h-64">
       {/* ヘラちゃんのメッセージ部分 */}
-      <HeraMessage />
-
-      <AffectionBadge />
+      <div className="mx-4">
+        <HeraMessage />
+      </div>
+      <div className="fixed right-4 bottom-40 md:bottom-56 md:right-20">
+        <AffectionBadge />
+      </div>
+      <HeraMainImage />
       <CreateTodoDialog userId={userId} />
       {/* いずれ消す */}
-      <Debugger />
+      {/* <Debugger /> */}
     </div>
   );
 };

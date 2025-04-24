@@ -4,7 +4,6 @@ import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
-import Footer from "@/components/footer";
 import { MobileNavigation } from "@/components/mobileNavigation";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -40,11 +39,10 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <main className="min-h-screen flex flex-col items-center">
-            <div className="w-full h-14 bg-white shadow-sm flex items-center justify-end mb-4">
+            <div className="w-full h-14shadow-sm flex items-center justify-end mb-4">
               <HeaderAuth user={user} />
             </div>
             {children}
-            <Footer />
           </main>
           {user && <MobileNavigation />}
         </ThemeProvider>

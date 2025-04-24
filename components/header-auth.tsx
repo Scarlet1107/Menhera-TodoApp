@@ -7,6 +7,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import { User } from "@supabase/supabase-js";
 import { Home, Settings, ShoppingBag, ListTodo } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type Props = {
   user: User | null;
@@ -39,16 +40,18 @@ export default function Header({ user }: Props) {
   const pathname = usePathname();
 
   return (
-    <header className="w-full border-b bg-pink-50 dark:bg-zinc-900 border-pink-200 dark:border-zinc-800 px-4 shadow-sm h-14 flex items-center justify-between">
-      {/* 左側：ロゴやアプリ名 */}
-      <Link href="/protected/home" className="text-sm font-bold text-pink-600">
-        メンヘラTodo
+    <header className="w-full border-b bg-pink-50/80 dark:bg-stone-800/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between">
+      <Link href="/protected/home">
+        <Image
+          src="/header-icon.png"
+          height={150}
+          width={180}
+          alt="Header-Icon"
+        />
       </Link>
 
-      {/* 右側：内容はログイン状態と画面幅で変わる */}
       {user ? (
         <>
-          {/* PC：Shadcn風ナビゲーション */}
           <nav className="hidden sm:flex gap-4 ml-8">
             {tabs.map(({ href, icon, label }) => {
               const isActive =
@@ -72,7 +75,7 @@ export default function Header({ user }: Props) {
             })}
           </nav>
 
-          {/* 共通：ThemeSwitcher（右端） */}
+          {/* 共通：ThemeSwitcher */}
           <div className="flex items-center gap-4 ml-auto text-sm">
             <ThemeSwitcher />
           </div>

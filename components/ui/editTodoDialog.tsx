@@ -23,6 +23,7 @@ import { Todo } from "@/lib/hera/types";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
+import { toJstDateString, jstDateStringToUtcIso } from "@/utils/date";
 
 type EditProps = { todo: Todo; updateAffection: UpdateAffectionFn };
 export const EditTodoDialog: React.FC<EditProps> = ({
@@ -32,25 +33,26 @@ export const EditTodoDialog: React.FC<EditProps> = ({
   const [open, setOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
-  const today = new Date().toISOString().slice(0, 10);
-  const d0 = todo.deadline.toString().slice(0, 10);
+
+  // 日本時間基準で「今日」と「既存締切日」を文字列に
+  const todayJst = toJstDateString(new Date());
+  const initialDateJst = toJstDateString(new Date(todo.deadline));
+
   const [title, setTitle] = useState(todo.title);
   const [description, setDescription] = useState(todo.description || "");
-  const [date, setDate] = useState<string>(d0);
+  const [date, setDate] = useState<string>(initialDateJst);
   const [loading, setLoading] = useState(false);
   const { affection, setHeraStatus } = useHera();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // …入力チェックまわりは省略…
-
     setLoading(true);
 
-    // フォームの date 文字列から日付を生成
-    const [y, m, d] = date.split("-").map(Number);
-    const newDeadline = new Date(y, m - 1, d, 23, 59, 59);
+    // 編集後の日付を日本時間終日→UTC ISOへ変換
+    const deadlineIso = jstDateStringToUtcIso(date);
 
-    const originalDateOnly = todo.deadline.slice(0, 10);
+    // 元の締切日文字列（JST）
+    const originalDateOnly = initialDateJst;
     const newDateOnly = date;
 
     // DB 更新
@@ -59,7 +61,7 @@ export const EditTodoDialog: React.FC<EditProps> = ({
       .update({
         title,
         description: description || null,
-        deadline: newDeadline,
+        deadline: deadlineIso,
       })
       .eq("id", todo.id);
 
@@ -126,7 +128,7 @@ export const EditTodoDialog: React.FC<EditProps> = ({
               id="edate"
               type="date"
               value={date}
-              min={today}
+              min={todayJst}
               onChange={(e) => setDate(e.target.value)}
               required
             />

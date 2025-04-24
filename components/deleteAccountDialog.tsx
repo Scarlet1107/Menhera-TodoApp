@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface Props {
   action: () => Promise<void>;
@@ -34,10 +35,20 @@ export default function BadEndClient({ action }: Props) {
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
         <AlertDialogHeader>
-          <AlertDialogTitle>……もう君はいらないの？</AlertDialogTitle>
+          <AlertDialogTitle className="text-red-700">
+            ……もう君はいらないの？
+          </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="flex flex-col items-center space-y-4">
-              <p>ずっと待ってたのに…来ないなら、私…消えちゃうから…</p>
+              <p className="text-red-500">
+                ずっと待ってたのに…来ないなら、私…消えちゃうから…
+              </p>
+              <Image
+                src="/hera-chan/special/bad-end.png"
+                width={200}
+                height={200}
+                alt="バッドエンドへらちゃん"
+              />
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

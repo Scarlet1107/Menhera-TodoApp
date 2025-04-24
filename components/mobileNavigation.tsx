@@ -18,14 +18,14 @@ export const MobileNavigation = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-md sm:hidden">
-      <ul className="flex justify-around items-center py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-pink-50/70 border-pink-200 dark:bg-white/50 border-t dark:border-gray-200 shadow-md sm:hidden">
+      <ul className="flex justify-around items-center p-2 ">
         {tabs.map(({ href, icon: Icon, label }) => {
           const isActive = pathname === href;
           return (
             <li key={href}>
               <Link href={href}>
-                <div className="flex flex-col items-center text-xs">
+                <div className="flex flex-col items-center text-xs rounded-full bg-white aspect-square w-13 h-13 justify-center hover:bg-pink-50 transition-all duration-200 ease-in-out">
                   <Icon
                     className={cn(
                       "h-5 w-5 mb-1",

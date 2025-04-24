@@ -18,7 +18,7 @@ export async function updateAffection(userId: string, delta: number) {
     .eq("user_id", userId)
     .single();
   const current = profileData?.affection ?? 0;
-  const newAffection = current + delta;
+  const newAffection = Math.min(100, Math.max(0, current + delta));
   // プロフィール更新
   await supabase
     .from("profile")

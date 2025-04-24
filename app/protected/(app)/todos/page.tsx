@@ -22,6 +22,7 @@ import { EditTodoDialog } from "@/components/ui/editTodoDialog";
 import { DeleteTodoButton } from "@/components/deleteTodoButton";
 import HeraMessage from "@/components/heraMessage";
 import { AffectionBadge } from "@/components/affectionBadge";
+import HeraIconImage from "@/components/heraIconImage";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -56,8 +57,11 @@ export default async function TodosPage() {
   (t: { completed: any }) => t.completed;
 
   return (
-    <div className="p-4 mx-auto w-full max-w-4xl">
-      <HeraMessage />
+    <div className="p-4 mx-auto min-w-0 w-full max-w-4xl mb-32 md:mb-0">
+      <div className="flex space-x-2 items-center">
+        <HeraIconImage />
+        <HeraMessage />
+      </div>
       <CreateTodoDialog userId={userId} />
       <Tabs defaultValue="active" className="mt-4">
         <TabsList className="w-full max-w-3xl mx-auto">
@@ -69,7 +73,7 @@ export default async function TodosPage() {
             {active.length > 0 ? (
               active.map((todo) => (
                 <Card key={todo.id} className="w-full relative">
-                  <CardHeader className="relative">
+                  <CardHeader className="relative w-3/4">
                     <CardTitle>{todo.title}</CardTitle>
                     <CardDescription>
                       {dayjs.utc(todo.deadline).tz().format("YYYY-MM-DD")}
@@ -102,7 +106,7 @@ export default async function TodosPage() {
                 </Card>
               ))
             ) : (
-              <div className="text-gray-500 text-center col-span-full flex items-center justify-center min-h-[200px]">
+              <div className="text-gray-700 bg-white/80 dark:text-white px-2 text-lg dark:bg-stone-800/70 rounded-xl text-center col-span-full flex items-center justify-center min-h-[200px]">
                 現在タスクはありません。Todoを作成してヘラちゃんの好感度を上げましょう
               </div>
             )}

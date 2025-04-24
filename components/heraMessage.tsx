@@ -11,19 +11,19 @@ interface HeraMessageProps {
 }
 
 const moodColorMap: Record<HeraMood, string> = {
-  最高: "bg-pink-200 dark:bg-pink-900",
-  良い: "bg-pink-100 dark:bg-pink-800",
-  普通: "bg-neutral-200 dark:bg-neutral-800",
-  悪い: "bg-yellow-100 dark:bg-yellow-900",
-  非常に悪い: "bg-red-100 dark:bg-red-900",
+  最高: "bg-pink-50 dark:bg-pink-500",
+  良い: "bg-pink-100 dark:bg-pink-700",
+  普通: "bg-stone-100 dark:bg-stone-700",
+  悪い: "bg-stone-200 dark:bg-stone-800",
+  非常に悪い: "bg-black/90 dark:bg-red-800",
 };
 
 const moodShadowMap: Record<HeraMood, string> = {
-  最高: "shadow-pink-300 dark:shadow-pink-800",
-  良い: "shadow-pink-200 dark:shadow-pink-600",
-  普通: "shadow-gray-300 dark:shadow-gray-700",
-  悪い: "shadow-yellow-400 dark:shadow-yellow-700",
-  非常に悪い: "shadow-red-400 dark:shadow-red-800",
+  最高: "shadow-pink-100 dark:shadow-pink-800",
+  良い: "shadow-pink-50  dark:shadow-pink-700",
+  普通: "shadow-stone-100 dark:shadow-stone-700",
+  悪い: "shadow-stone-200 dark:shadow-stone-900",
+  非常に悪い: "shadow-black/20 dark:shadow-white/20",
 };
 
 const moodFontMap: Record<HeraMood, string> = {
@@ -34,7 +34,7 @@ const moodFontMap: Record<HeraMood, string> = {
   非常に悪い: "font-creepy",
 };
 
-const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 30 }) => {
+const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 80 }) => {
   const { affection, message } = useHera();
   const [displayedText, setDisplayedText] = useState("");
   const controls = useAnimation();
