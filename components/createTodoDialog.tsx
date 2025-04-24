@@ -22,38 +22,49 @@ import { toast } from "sonner";
 import { updateAffection } from "@/app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
+import { toJstDateString, jstDateStringToUtcIso } from "@/utils/date";
 
 type CreateProps = { userId: string };
 export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
   const [open, setOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
-  const today = new Date().toISOString().slice(0, 10);
-  const todayLocal = new Date().toLocaleDateString("en-CA");
+
+  // JST 基準の日付文字列
+  const todayJst = toJstDateString(new Date());
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<string>(today);
+  const [date, setDate] = useState<string>(todayJst);
   const [loading, setLoading] = useState(false);
   const { affection, setHeraStatus } = useHera();
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("Today JST", todayJst);
+    console.log("Date", date);
+    console.log("Date UTC", new Date(date).toISOString());
+    console.log("Date UTC ISO", jstDateStringToUtcIso(date));
     e.preventDefault();
-    if (date < today) {
+    // 過去日の選択は不可
+    if (date < todayJst) {
       toast.error("過去の日付は選択できません");
       return;
     }
     setLoading(true);
-    const [y, m, d] = date.split("-").map(Number);
-    const deadline = new Date(y, m - 1, d, 23, 59, 59);
+
+    // JST の YYYY-MM-DD を UTC ISO に変換
+    const deadlineIso = jstDateStringToUtcIso(date);
+
     const { error } = await supabase.from("todo").insert({
       user_id: userId,
       title,
       description: description || null,
-      deadline,
+      deadline: deadlineIso,
       completed: false,
     });
-    if (error) toast.error("タスク作成に失敗");
-    else {
+    if (error) {
+      toast.error("タスク作成に失敗");
+    } else {
       const delta = 1;
       await updateAffection(userId, delta);
       const message = getActionMessage("create" as HeraAction, affection);
@@ -117,7 +128,7 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
               id="date"
               type="date"
               value={date}
-              min={todayLocal}
+              min={todayJst}
               onChange={(e) => setDate(e.target.value)}
               required
             />

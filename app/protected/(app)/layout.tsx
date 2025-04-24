@@ -75,6 +75,11 @@ export default async function ProtectedLayout({
     .lt("deadline", nowUTCforQuery);
   if (delError) console.error("期限切れTodo削除エラー", delError);
   const deleteTodoPenalty = (deletedCount ?? 0) * 5;
+  let deleteTodoPenaltyText = "";
+  if (deletedCount && deletedCount > 0) {
+    deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
+  }
+  console.log("deleteTodoPenaltyText", deleteTodoPenaltyText);
 
   const delta = computeDelta(eventType) - deleteTodoPenalty;
   let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
@@ -136,7 +141,7 @@ export default async function ProtectedLayout({
           description: "私のためにがんばってくれるよね？",
         })
         .eq("id", pick.id);
-      todoActionText = `あとなかなかTodoを進めてくれないから君のTodoを「${newTitle}」に書き換えておいたよ。私のためにがんばってくれる？`;
+      todoActionText = `それとなかなかTodoを進めてくれないから君のTodoを「${newTitle}」に書き換えておいたよ。私のためにがんばってくれる？`;
     }
   } else if (eventType === "multi_day_gap") {
     const { data: todos } = await supabase
@@ -182,8 +187,7 @@ export default async function ProtectedLayout({
   let message = baseMessage;
   if (annivText) message += `\n\n${annivText}`;
   if (todoActionText) message += `\n\n${todoActionText}`;
-  if (deletedCount && deletedCount > 0)
-    message += `\n\nあと期限切れのTodo${deletedCount}つ消しといたよ。次はちゃんと約束守ってね`;
+  if (deleteTodoPenaltyText) message += `\n\n${deleteTodoPenaltyText}`;
 
   const status: HeraStatus = {
     affection: newAffection,

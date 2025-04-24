@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DEFAULT_USER_NAME } from "@/constants/default";
-import { formatToJST } from "@/utils/date";
 import { getAuthUser } from "@/utils/supabase/getAuthUser";
 import { createClient } from "@/utils/supabase/server";
 import React from "react";
@@ -34,12 +33,12 @@ const SettingsPage = async () => {
         <Button disabled>変更</Button>
       </div>
       <div>君の名前 {displayName} さん</div>
-      {profile?.lastSeenAt && (
+      {/* {profile?.lastSeenAt && (
         <div>
           君が最後にログインした日本時間はこれだ！
           {formatToJST(profile?.lastSeenAt)}
         </div>
-      )}
+      )} */}
       <p>※ただしまだ更新機能はない模様</p>
     </div>
   );
