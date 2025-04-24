@@ -54,7 +54,7 @@ export const messages: Record<HeraMood, Partial<Record<EventType, string>>> = {
   },
 
   非常に悪い: {
-    same_day: "今日も来た…暇なの？ウザいんだけど。",
+    same_day: "今日も来た…暇なの",
     continuous_active: "毎日？…もう勘弁してほしい。",
     continuous_inactive: "昨日来ない？…勝手にしてて。",
     one_day_gap: "1日…やっと静かになった。",
