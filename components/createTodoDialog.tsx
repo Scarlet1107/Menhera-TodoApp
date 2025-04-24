@@ -1,6 +1,5 @@
 // app/protected/todos/CreateTodoDialog.tsx
 "use client";
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -20,59 +19,45 @@ import { Edit } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 
-/**
- * Props
- */
-export type CreateTodoDialogProps = {
-  userId: string;
-  updateAffection: (userId: string, delta: number) => Promise<void>;
-};
-
-export const CreateTodoDialog: React.FC<CreateTodoDialogProps> = ({
+type CreateProps = { userId: string; updateAffection: UpdateAffectionFn };
+export const CreateTodoDialog: React.FC<CreateProps> = ({
   userId,
   updateAffection,
 }) => {
   const [open, setOpen] = useState(false);
   const supabase = createClient();
   const router = useRouter();
-
+  const today = new Date().toISOString().slice(0, 10);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const today = new Date().toISOString().slice(0, 10);
   const [date, setDate] = useState<string>(today);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 過去日の選択を再チェック
     if (date < today) {
       toast.error("過去の日付は選択できません");
       return;
     }
     setLoading(true);
-
-    const [year, month, day] = date.split("-").map(Number);
-    const deadlineDate = new Date(year, month - 1, day, 23, 59, 59);
-
+    const [y, m, d] = date.split("-").map(Number);
+    const deadline = new Date(y, m - 1, d, 23, 59, 59);
     const { error } = await supabase.from("todo").insert({
       user_id: userId,
       title,
       description: description || null,
-      deadline: deadlineDate,
+      deadline,
       completed: false,
     });
-
-    if (error) {
-      toast.error("タスクの作成に失敗しました");
-    } else {
-      // 好感度 +1
+    if (error) toast.error("タスク作成に失敗");
+    else {
       await updateAffection(userId, 1);
       toast.success("タスクを作成しました。好感度 +1");
       setOpen(false);
       router.refresh();
     }
-
     setLoading(false);
   };
 
@@ -80,8 +65,8 @@ export const CreateTodoDialog: React.FC<CreateTodoDialogProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="fixed right-4 bottom-20 md:top-6 md:right-6 md:bottom-auto z-50 w-14 h-14 flex items-center justify-center rounded-full bg-pink-400 text-stone-50 hover:bg-pink-500 shadow-lg"
-          aria-label="新しいタスクを作成"
+          className="fixed right-4 bottom-20 md:top-6 md:right-6 z-50 w-14 h-14 rounded-full bg-pink-400 text-white"
+          aria-label="新規タスク"
         >
           <Edit size={24} />
         </Button>
@@ -95,26 +80,26 @@ export const CreateTodoDialog: React.FC<CreateTodoDialogProps> = ({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div>
-            <Label htmlFor="todo-title">タイトル</Label>
+            <Label htmlFor="title">タイトル</Label>
             <Input
-              id="todo-title"
+              id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
           <div>
-            <Label htmlFor="todo-description">説明</Label>
+            <Label htmlFor="desc">説明</Label>
             <Textarea
-              id="todo-description"
+              id="desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div>
-            <Label htmlFor="todo-date">締切日</Label>
+            <Label htmlFor="date">締切日</Label>
             <Input
-              id="todo-date"
+              id="date"
               type="date"
               value={date}
               min={today}
@@ -123,14 +108,14 @@ export const CreateTodoDialog: React.FC<CreateTodoDialogProps> = ({
             />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={loading}>
-              作成
-            </Button>
             <DialogClose asChild>
               <Button variant="ghost" disabled={loading}>
                 キャンセル
               </Button>
             </DialogClose>
+            <Button type="submit" disabled={loading}>
+              作成
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

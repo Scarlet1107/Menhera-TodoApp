@@ -20,6 +20,7 @@ export type { HeraMood };
 
 // 型定義
 export type Todo = {
+  user_id: string;
   id: string;
   title: string;
   description?: string;

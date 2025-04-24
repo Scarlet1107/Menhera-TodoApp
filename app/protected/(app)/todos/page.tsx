@@ -1,6 +1,8 @@
 // app/protected/todos/page.tsx
 import React from "react";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import isBetween from "dayjs/plugin/isBetween";
 import { createClient } from "@/utils/supabase/server";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -11,12 +13,19 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Todo } from "@/lib/hera/types";
-import { CompleteCheckbox } from "@/components/completeCheckbox";
-import { CreateTodoDialog } from "@/components/CreateTodoDialog";
-import { redirect } from "next/navigation";
 import { updateAffection } from "./actions";
+import { CreateTodoDialog } from "@/components/createTodoDialog";
+import { redirect } from "next/navigation";
+import type { Todo } from "@/lib/hera/types";
+import { CompleteCheckbox } from "@/components/completeCheckbox";
+import { EditTodoDialog } from "@/components/ui/editTodoDialog";
+import { DeleteTodoButton } from "@/components/deleteTodoButton";
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
+if (typeof dayjs.tz === "function") {
+  dayjs.tz.setDefault("Asia/Tokyo");
+}
 dayjs.extend(isBetween);
 
 export default async function TodosPage() {
@@ -29,110 +38,94 @@ export default async function TodosPage() {
 
   const { data: todos, error } = await supabase
     .from("todo")
-    .select("id, title, description, deadline, completed")
+    .select("*")
     .order("deadline", { ascending: true });
-
   if (error)
     return <div className="p-4 text-red-500">エラー: {error.message}</div>;
 
   const list: Todo[] = todos ?? [];
   const todayStart = dayjs().startOf("day");
-  const tomorrowStart = todayStart.add(1, "day");
 
-  const todaysTodos = list.filter(
-    (t) =>
-      !t.completed &&
-      dayjs(t.deadline).isBetween(todayStart, tomorrowStart, null, "[]")
-  );
-  const upcomingTodos = list.filter(
-    (t) => !t.completed && !dayjs(t.deadline).isBefore(tomorrowStart)
-  );
-  const completedTodos = list.filter((t) => t.completed);
+  const active = list.filter((t) => {
+    const dl = dayjs.utc(t.deadline).tz();
+    return !t.completed && !dl.isBefore(todayStart);
+  });
+  const completed = list.filter((t) => t.completed);
+  (t: { completed: any }) => t.completed;
 
   return (
-    <div className="p-4 w-full max-w-4xl mx-auto">
-      <Tabs defaultValue="incomplete" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="incomplete" className="w-full text-center">
-            未完了
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="w-full text-center">
-            完了
-          </TabsTrigger>
+    <div className="p-4 mx-auto w-full max-w-4xl">
+      <CreateTodoDialog userId={userId} updateAffection={updateAffection} />
+      <Tabs defaultValue="active" className="mt-4">
+        <TabsList className="w-full max-w-3xl mx-auto">
+          <TabsTrigger value="active">未完了</TabsTrigger>
+          <TabsTrigger value="completed">完了</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="incomplete" className="w-full space-y-6">
-          {todaysTodos.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold mb-2">今日のタスク</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {todaysTodos.map((todo) => (
-                  <Card key={todo.id} className="relative">
-                    <CardHeader>
-                      <CardTitle>{todo.title}</CardTitle>
-                      <CardDescription>
-                        {dayjs(todo.deadline).format("YYYY-MM-DD")}
-                      </CardDescription>
-                    </CardHeader>
-                    {todo.description && (
-                      <CardContent>{todo.description}</CardContent>
-                    )}
-                    <div className="absolute top-2 right-2">
+        <TabsContent value="active">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {active.length > 0 ? (
+              active.map((todo) => (
+                <Card key={todo.id} className="w-full">
+                  <CardHeader className="relative">
+                    <CardTitle>{todo.title}</CardTitle>
+                    <CardDescription>
+                      {dayjs.utc(todo.deadline).tz().format("YYYY-MM-DD")}
+                    </CardDescription>
+                    <div className="absolute right-2 top-2 flex space-x-1">
                       <CompleteCheckbox
                         id={todo.id}
                         completed={todo.completed}
+                        userId={userId}
+                        updateAffection={updateAffection}
+                      />
+                      <EditTodoDialog
+                        todo={todo}
+                        updateAffection={updateAffection}
+                      />
+                      <DeleteTodoButton
+                        todoId={todo.id}
+                        userId={userId}
+                        updateAffection={updateAffection}
                       />
                     </div>
-                  </Card>
-                ))}
+                  </CardHeader>
+                  {todo.description && (
+                    <CardContent>{todo.description}</CardContent>
+                  )}
+                </Card>
+              ))
+            ) : (
+              <div className="text-gray-500 text-center col-span-full flex items-center justify-center min-h-[200px]">
+                現在タスクはありません。Todoを作成してヘラちゃんの好感度を上げましょう
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="completed">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {upcomingTodos.map((todo) => (
-              <Card key={todo.id} className="relative">
+            {completed.map((todo) => (
+              <Card key={todo.id} className="w-full opacity-70 relative">
                 <CardHeader>
                   <CardTitle>{todo.title}</CardTitle>
-                  <CardDescription>
-                    {dayjs(todo.deadline).format("YYYY-MM-DD")}
-                  </CardDescription>
+                  <CardDescription>完了済み</CardDescription>
                 </CardHeader>
                 {todo.description && (
                   <CardContent>{todo.description}</CardContent>
                 )}
                 <div className="absolute top-2 right-2">
-                  <CompleteCheckbox id={todo.id} completed={todo.completed} />
+                  <CompleteCheckbox
+                    id={todo.id}
+                    completed={todo.completed}
+                    userId={userId}
+                    updateAffection={updateAffection}
+                  />
                 </div>
               </Card>
             ))}
           </div>
         </TabsContent>
-
-        <TabsContent value="completed" className="w-full">
-          {completedTodos.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {completedTodos.map((todo) => (
-                <Card key={todo.id} className="opacity-70 relative">
-                  <CardHeader>
-                    <CardTitle>{todo.title}</CardTitle>
-                    <CardDescription>完了済み</CardDescription>
-                  </CardHeader>
-                  {todo.description && (
-                    <CardContent>{todo.description}</CardContent>
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <CompleteCheckbox id={todo.id} completed={todo.completed} />
-                  </div>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p>完了済みのタスクはありません。</p>
-          )}
-        </TabsContent>
       </Tabs>
-      {/* 好感度更新アクションを渡す */}
-      <CreateTodoDialog userId={userId} updateAffection={updateAffection} />
     </div>
   );
 }

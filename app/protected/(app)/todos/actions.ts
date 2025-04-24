@@ -5,6 +5,10 @@ import { createClient } from "@/utils/supabase/server";
 /**
  * プロフィールのaffectionを増減するサーバーアクション
  */
+export type UpdateAffectionFn = (
+  userId: string,
+  delta: number
+) => Promise<void>;
 export async function updateAffection(userId: string, delta: number) {
   const supabase = await createClient();
   // 現在のaffectionを取得
