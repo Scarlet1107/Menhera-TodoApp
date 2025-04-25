@@ -41,6 +41,7 @@ export default async function TodosPage() {
   const { data: todos, error } = await supabase
     .from("todo")
     .select("*")
+    .eq("user_id", userId)
     .order("deadline", { ascending: true });
   if (error)
     return <div className="p-4 text-red-500">エラー: {error.message}</div>;
