@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { AffectionBadge } from "@/components/affectionBadge";
+import { useHera } from "@/lib/hera/context";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -11,6 +13,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<Message[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { setHeraStatus } = useHera();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -29,8 +32,15 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: [...history, userMsg] }),
       });
-      const { reply } = await res.json();
-      setHistory((h) => [...h, { role: "assistant", content: reply }]);
+      const data = (await res.json()) as {
+        reply: string;
+        affection: number;
+        delta: number;
+      };
+      setHistory((h) => [...h, { role: "assistant", content: data.reply }]);
+      setHeraStatus({
+        delta: data.delta,
+      });
     } catch (e) {
       console.error(e);
       toast.error("通信エラーが発生しました");
