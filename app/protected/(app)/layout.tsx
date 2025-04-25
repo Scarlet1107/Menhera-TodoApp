@@ -79,7 +79,6 @@ export default async function ProtectedLayout({
   if (deletedCount && deletedCount > 0) {
     deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
   }
-  console.log("deleteTodoPenaltyText", deleteTodoPenaltyText);
 
   const delta = computeDelta(eventType) - deleteTodoPenalty;
   let newAffection = Math.max(0, Math.min(100, profile.affection + delta));

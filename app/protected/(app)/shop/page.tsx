@@ -2,8 +2,9 @@
 import React from "react";
 import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
-import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import PurchaseAction from "./shopItem";
+import { Card, CardTitle } from "@/components/ui/card";
+import PurchaseDialog from "@/components/PurchaseDialog";
+import { formatPrice } from "@/utils/formatPrice";
 
 export const dynamic = "force-dynamic";
 
@@ -28,12 +29,31 @@ const shopItems = [
     isComingSoon: false,
   },
   {
+    id: "chikawa",
+    name: "おくすり？",
+    price: 99999,
+    affectionGain: 0,
+    imgSrc: "/shop/medicine.png",
+    contentSrc: "/chikawa/mosaic-eyes.png",
+    alt: "おくすり?",
+    isComingSoon: true,
+  },
+  {
     id: "mic",
     name: "話し方変更",
     price: 99999,
     affectionGain: 0,
     imgSrc: "/shop/mic.png",
     alt: "話し方変更",
+    isComingSoon: true,
+  },
+  {
+    id: "maid",
+    name: "着せ替え",
+    price: 99999,
+    affectionGain: 0,
+    imgSrc: "/shop/maid.png",
+    alt: "着せ替え",
     isComingSoon: true,
   },
 ];
@@ -46,8 +66,7 @@ export default async function Page() {
   const userId = user?.id;
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-center">マイヘラショップ</h1>
+    <div className="p-4 max-w-md mx-auto mb-24 md:mb-0">
       <div className="flex flex-col space-y-4">
         {shopItems.map((item) => (
           <Card key={item.id} className="flex flex-row items-center p-4">
@@ -57,8 +76,9 @@ export default async function Page() {
             <div className="flex-grow ml-4">
               <CardTitle className="text-lg">{item.name}</CardTitle>
               <div className="text-sm mb-1">
-                <span className="line-through">{item.price}円</span>{" "}
-                <span>無料 (デモ版)</span>
+                <span className="line-through">{formatPrice(item.price)}</span>
+                <br />
+                <span>→ 無料 (デモ版)</span>
               </div>
               {!item.isComingSoon && (
                 <div className="text-xs text-gray-500">
@@ -70,7 +90,7 @@ export default async function Page() {
               )}
             </div>
             <div className="ml-4">
-              <PurchaseAction item={item} userId={userId!} />
+              <PurchaseDialog item={item} userId={userId!} />
             </div>
           </Card>
         ))}
