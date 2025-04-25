@@ -76,7 +76,7 @@ const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 80 }) => {
 
   return (
     <div
-      className={`p-4 rounded-xl text-lg whitespace-pre-wrap transition-all duration-300 ${background} ${shadow} ${font} shadow-md`}
+      className={`p-4 rounded-xl md:text-lg whitespace-pre-wrap transition-all duration-300 ${background} ${shadow} ${font} shadow-md`}
     >
       <motion.span animate={controls} className="inline-block">
         {displayedText}
