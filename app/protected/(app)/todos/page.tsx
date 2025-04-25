@@ -45,6 +45,13 @@ export default async function TodosPage() {
   if (error)
     return <div className="p-4 text-red-500">エラー: {error.message}</div>;
 
+  const { data: profile } = await supabase
+    .from("profile")
+    .select("difficulty")
+    .eq("user_id", user.id)
+    .single();
+  const isHard = profile?.difficulty === "hard";
+
   const list: Todo[] = todos ?? [];
   const todayStart = dayjs().startOf("day");
 
@@ -61,7 +68,7 @@ export default async function TodosPage() {
         <HeraIconImage />
         <HeraMessage />
       </div>
-      <CreateTodoDialog userId={userId} />
+      {!isHard && <CreateTodoDialog userId={userId} />}
       <Tabs defaultValue="active" className="mt-4">
         <TabsList className="w-full max-w-3xl mx-auto">
           <TabsTrigger value="active">未完了</TabsTrigger>
@@ -89,19 +96,23 @@ export default async function TodosPage() {
                       updateAffection={updateAffection}
                     />
                   </div>
-                  <div className="absolute top-4 right-16">
-                    <EditTodoDialog
-                      todo={todo}
-                      updateAffection={updateAffection}
-                    />
-                  </div>
-                  <div className="absolute top-4 right-4">
-                    <DeleteTodoButton
-                      todoId={todo.id}
-                      userId={userId}
-                      updateAffection={updateAffection}
-                    />
-                  </div>
+                  {!isHard && (
+                    <>
+                      <div className="absolute top-4 right-16">
+                        <EditTodoDialog
+                          todo={todo}
+                          updateAffection={updateAffection}
+                        />
+                      </div>
+                      <div className="absolute top-4 right-4">
+                        <DeleteTodoButton
+                          todoId={todo.id}
+                          userId={userId}
+                          updateAffection={updateAffection}
+                        />
+                      </div>
+                    </>
+                  )}
                 </Card>
               ))
             ) : (

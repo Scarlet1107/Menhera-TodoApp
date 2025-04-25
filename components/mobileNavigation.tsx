@@ -2,19 +2,30 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, Settings, ShoppingBag, ListTodo } from "lucide-react";
+import {
+  Home,
+  Settings,
+  ShoppingBag,
+  ListTodo,
+  MessageSquare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const tabs = [
-  { href: "/protected/home", icon: Home, label: "ホーム" },
-  { href: "/protected/todos", icon: ListTodo, label: "Todos" },
-  { href: "/protected/shop", icon: ShoppingBag, label: "ショップ" },
-  { href: "/protected/settings", icon: Settings, label: "設定" },
-];
-
+type Props = {
+  isHard: boolean;
+};
 // サーバーコンポーネントで実装したかった;;
 // サーバーコンポーネントだとisActiveがうまく動かない
-export const MobileNavigation = () => {
+export const MobileNavigation = ({ isHard }: Props) => {
+  const tabs: { href: string; icon: typeof Home; label: string }[] = [
+    { href: "/protected/home", icon: Home, label: "ホーム" },
+    { href: "/protected/todos", icon: ListTodo, label: "Todos" },
+    ...(isHard
+      ? [{ href: "/protected/chat", icon: MessageSquare, label: "チャット" }]
+      : []),
+    { href: "/protected/shop", icon: ShoppingBag, label: "ショップ" },
+    { href: "/protected/settings", icon: Settings, label: "設定" },
+  ];
   const pathname = usePathname();
 
   return (
