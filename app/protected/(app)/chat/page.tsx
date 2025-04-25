@@ -4,16 +4,33 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { AffectionBadge } from "@/components/affectionBadge";
 import { useHera } from "@/lib/hera/context";
 
 type Message = { role: "user" | "assistant"; content: string };
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState<Message[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const { setHeraStatus } = useHera();
+  const [history, setHistory] = useState<Message[]>([]);
+  useEffect(() => {
+    const raw = localStorage.getItem("chatHistory");
+    if (raw) setHistory(JSON.parse(raw));
+  }, []);
+
+  // ── 2) StrictMode で useEffect が二度呼ばれても保存は一度だけ
+  const isFirstSave = useRef(true);
+  useEffect(() => {
+    if (isFirstSave.current) {
+      isFirstSave.current = false;
+      return;
+    }
+    try {
+      localStorage.setItem("chatHistory", JSON.stringify(history));
+    } catch {
+      console.error("localStorage error");
+    }
+  }, [history]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -23,14 +40,15 @@ export default function ChatPage() {
   const send = async () => {
     if (!input.trim()) return;
     const userMsg: Message = { role: "user", content: input };
-    setHistory((h) => [...h, userMsg]);
+    const newHistory = [...history, userMsg];
+    setHistory(newHistory);
     setInput("");
-
+    const messages = newHistory.slice(-5);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...history, userMsg] }),
+        body: JSON.stringify({ messages: messages }),
       });
       const data = (await res.json()) as {
         reply: string;
