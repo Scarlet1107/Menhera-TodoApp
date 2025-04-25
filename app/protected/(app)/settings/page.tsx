@@ -5,22 +5,13 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { getAuthUser } from "@/utils/supabase/getAuthUser";
 import { DEFAULT_USER_NAME } from "@/constants/default";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LogoutDialog from "@/components/logoutDialog";
-
-export const metadata: Metadata = {
-  title: "設定 - メンヘラTodoアプリ",
-};
+import dayjs from "dayjs";
 
 const SettingsPage = async () => {
   const user = await getAuthUser();
@@ -32,6 +23,7 @@ const SettingsPage = async () => {
     .select("last_seen_at")
     .eq("user_id", user.id)
     .single();
+  console.log("profile last seen at", profile?.last_seen_at);
 
   return (
     <div className="p-4 max-w-md mx-auto space-y-6">
@@ -48,14 +40,10 @@ const SettingsPage = async () => {
             <div>
               <Label>最終ログイン</Label>
               <p className="text-sm text-gray-600">
-                {new Date(profile.last_seen_at).toLocaleString("ja-JP", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                })}
+                {(() => {
+                  const jst = dayjs.utc(profile.last_seen_at).tz("Asia/Tokyo");
+                  return jst.format("YYYY/MM/DD HH:mm");
+                })()}
               </p>
             </div>
           )}
