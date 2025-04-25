@@ -82,7 +82,14 @@ export default async function ProtectedLayout({
 
   const delta = computeDelta(eventType) - deleteTodoPenalty;
   let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
-  if (newAffection === 0) redirect("/protected/bad-end");
+
+  if (newAffection === 0) {
+    await supabase
+      .from("profile")
+      .update({ affection: newAffection })
+      .eq("user_id", user.id);
+    redirect("/protected/bad-end");
+  }
 
   const nowDate = new Date();
   const { error } = await supabase
