@@ -47,7 +47,26 @@ export async function POST(req: Request) {
     .single();
   let affection = prof?.affection ?? 0;
   const mood = getHeraMood(affection);
-  const declineRate = mood === "普通" ? 0.4 : mood === "悪い" ? 0.7 : 0;
+  let declineRate: number;
+  switch (mood) {
+    case "最高":
+      declineRate = 0;
+      break;
+    case "良い":
+      declineRate = 0.1;
+      break;
+    case "普通":
+      declineRate = 0.2;
+      break;
+    case "悪い":
+      declineRate = 0.3;
+      break;
+    case "非常に悪い":
+      declineRate = 0.4;
+      break;
+    default:
+      declineRate = 0;
+  }
   if (Math.random() < declineRate) {
     return NextResponse.json({ reply: "ごめん、今ちょっと…" }, { status: 200 });
   }
@@ -75,6 +94,7 @@ export async function POST(req: Request) {
 - ユーザーの“彼女”として Todo 管理を手伝う
 - 好感度（affection）に応じて反応が変化する
 - 返答は短め（30文字以内）でお願いします
+- 期限について入力がなければ24時間後に設定してください
 
 次のツールを提供します。  
 ツール名: manage_todo  

@@ -82,7 +82,7 @@ export default function ChatPage() {
     <div className="relative h-screen">
       <div
         ref={containerRef}
-        className="overflow-auto space-y-4 p-4 pb-32"
+        className="overflow-auto space-y-4 p-4 pb-40"
         style={{ height: "100%", boxSizing: "border-box" }}
       >
         {history.map((m, i) => (
