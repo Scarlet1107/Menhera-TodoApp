@@ -15,7 +15,7 @@ const moodColorMap: Record<HeraMood, string> = {
   良い: "bg-pink-100 dark:bg-pink-700",
   普通: "bg-stone-100 dark:bg-stone-700",
   悪い: "bg-stone-200 dark:bg-stone-800",
-  非常に悪い: "bg-black/90 dark:bg-red-800",
+  非常に悪い: "bg-red-700 dark:bg-red-800",
 };
 
 const moodShadowMap: Record<HeraMood, string> = {

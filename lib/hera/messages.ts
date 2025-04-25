@@ -7,7 +7,7 @@ export const FIRST_LOGIN_MESSAGE =
 
 export const messages: Record<HeraMood, Partial<Record<EventType, string>>> = {
   最高: {
-    same_day: "今日も最強だね！一緒に突き進もう！",
+    same_day: "今日も最高だね！一緒にがんばろう！",
     continuous_active: "毎日会えて本当にうれしい！これからもよろしくね！",
     continuous_inactive:
       "昨日はすぐ帰っちゃったけど、またきてくれてうれしい！明日も来てよね！",
@@ -33,7 +33,7 @@ export const messages: Record<HeraMood, Partial<Record<EventType, string>>> = {
   },
 
   普通: {
-    same_day: "来てくれたんだ…ちょっとうれしい…",
+    same_day: "来てくれたんだ…うれしい…",
     continuous_active: "ずっと来てるね。この調子でがんばってね",
     continuous_inactive:
       "昨日すぐかえっちゃったよね…何かあった？今日は頑張ってよね",
