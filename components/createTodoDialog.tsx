@@ -40,10 +40,6 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
   const { affection, setHeraStatus } = useHera();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("Today JST", todayJst);
-    console.log("Date", date);
-    console.log("Date UTC", new Date(date).toISOString());
-    console.log("Date UTC ISO", jstDateStringToUtcIso(date));
     e.preventDefault();
     // 過去日の選択は不可
     if (date < todayJst) {
@@ -75,6 +71,9 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
         message: message,
       });
       setOpen(false);
+      setTitle("");
+      setDescription("");
+      setDate(todayJst);
       router.refresh();
     }
     setLoading(false);
