@@ -43,7 +43,7 @@ export default function PurchaseDialog({
       item.name === "ケーキ"
         ? `${item.name}を買ってくれたの？これ一番好きなやつ！ありがとう。`
         : item.name === "プリン"
-          ? `${item.name}を買ってくれたの？これ好きなお店プリンだ！わざわざ並んでくれたの？`
+          ? `${item.name}を買ってくれたの？これ好きなお店のプリンだ！わざわざ並んでくれたの？`
           : `${item.name}を買ってくれたの？ありがとう！`;
     const newAffection = Math.min(
       100,
