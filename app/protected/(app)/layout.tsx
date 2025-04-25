@@ -34,7 +34,9 @@ export default async function ProtectedLayout({
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
-  if (authError || !user) redirect("/sign-in");
+  if (authError || !user) {
+    redirect("/sign-in");
+  }
 
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
   const createdAt = dayjs(user.created_at).tz("Asia/Tokyo");
@@ -50,7 +52,10 @@ export default async function ProtectedLayout({
     )
     .eq("user_id", user.id)
     .single();
-  if (profileError || !profile) redirect("/sign-in");
+  if (profileError || !profile) {
+    console.error("プロフィール取得エラー", profileError);
+    redirect("/sign-in");
+  }
 
   const lastSeenAt = profile.lastSeenAt
     ? dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo").startOf("day")

@@ -15,11 +15,12 @@ datasource db {
 }
 
 model Profile {
-  userId     String    @id @map("user_id") @db.Uuid
-  affection  Int       @default(70)
-  lastSeenAt DateTime? @map("last_seen_at")
-  lastActive DateTime? @map("last_active")
+  userId     String     @id @map("user_id") @db.Uuid
+  affection  Int        @default(70)
+  lastSeenAt DateTime?  @map("last_seen_at")
+  lastActive DateTime?  @map("last_active")
   todos      Todo[]
+  difficulty Difficulty @default(casual)
 
   @@map("profile")
 }
@@ -36,4 +37,9 @@ model Todo {
 
   @@index([userId])
   @@map("todo")
+}
+
+enum Difficulty {
+  casual
+  hard
 }
