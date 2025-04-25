@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useHera } from "@/lib/hera/context";
+import HeraIconImage from "@/components/heraIconImage";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -13,25 +14,24 @@ export default function ChatPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { setHeraStatus } = useHera();
   const [history, setHistory] = useState<Message[]>([]);
+
+  // 初回マウント時に localStorage から履歴を復元
   useEffect(() => {
     const raw = localStorage.getItem("chatHistory");
     if (raw) setHistory(JSON.parse(raw));
   }, []);
 
-  // ── 2) StrictMode で useEffect が二度呼ばれても保存は一度だけ
+  // Strict Mode での二重書き込みを防ぐ
   const isFirstSave = useRef(true);
   useEffect(() => {
     if (isFirstSave.current) {
       isFirstSave.current = false;
       return;
     }
-    try {
-      localStorage.setItem("chatHistory", JSON.stringify(history));
-    } catch {
-      console.error("localStorage error");
-    }
+    localStorage.setItem("chatHistory", JSON.stringify(history));
   }, [history]);
 
+  // 履歴が更新されるたびスクロール
   useEffect(() => {
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -44,11 +44,12 @@ export default function ChatPage() {
     setHistory(newHistory);
     setInput("");
     const messages = newHistory.slice(-5);
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: messages }),
+        body: JSON.stringify({ messages }),
       });
 
       if (!res.ok) {
@@ -57,24 +58,20 @@ export default function ChatPage() {
         toast.error(`サーバーエラー ${res.status}`);
         return;
       }
-      let data1;
+
+      // ボディを文字列で一度だけ読み込んでパース
+      const bodyText = await res.text();
+      let data: { reply: string; affection: number; delta: number };
       try {
-        data1 = await res.json();
+        data = JSON.parse(bodyText);
       } catch {
-        console.error("Invalid JSON:", await res.text());
+        console.error("Invalid JSON:", bodyText);
         toast.error("サーバーから不正な応答を受信しました");
         return;
       }
 
-      const data = (await res.json()) as {
-        reply: string;
-        affection: number;
-        delta: number;
-      };
       setHistory((h) => [...h, { role: "assistant", content: data.reply }]);
-      setHeraStatus({
-        delta: data.delta,
-      });
+      setHeraStatus({ delta: data.delta });
     } catch (e) {
       console.error(e);
       toast.error("通信エラーが発生しました");
@@ -83,26 +80,33 @@ export default function ChatPage() {
 
   return (
     <div className="relative h-screen">
-      {/* メッセージリスト：下部固定領域分 = 入力欄(h-16) + ナビ(h-16) の余白 */}
       <div
         ref={containerRef}
-        className="overflow-auto space-y-2 p-4 pb-32"
+        className="overflow-auto space-y-4 p-4 pb-32"
         style={{ height: "100%", boxSizing: "border-box" }}
       >
         {history.map((m, i) => (
           <div
             key={i}
-            className={m.role === "user" ? "text-right" : "text-left"}
+            className={`flex items-start ${
+              m.role === "user" ? "justify-end" : "justify-start"
+            }`}
           >
-            <div className="inline-block p-2 rounded-lg bg-gray-100">
+            {m.role === "assistant" && <HeraIconImage />}
+            <div
+              className={`max-w-[70%] p-2 rounded-lg break-words text-left ${
+                m.role === "user"
+                  ? "bg-pink-100 dark:bg-pink-700 text-black dark:text-white"
+                  : "bg-stone-100 dark:bg-stone-700 text-black dark:text-white"
+              }`}
+            >
               {m.content}
             </div>
           </div>
         ))}
       </div>
 
-      {/* 入力エリアを固定 */}
-      <div className="fixed left-0 right-0 p-4 bottom-16 md:bottom-0">
+      <div className="fixed left-0 right-0 p-4 bottom-16 md:bottom-0 bg-background/80">
         <div className="flex space-x-2">
           <Input
             value={input}
