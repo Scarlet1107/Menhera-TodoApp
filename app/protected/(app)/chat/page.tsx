@@ -50,6 +50,22 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: messages }),
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("API error:", res.status, text);
+        toast.error(`サーバーエラー ${res.status}`);
+        return;
+      }
+      let data1;
+      try {
+        data1 = await res.json();
+      } catch {
+        console.error("Invalid JSON:", await res.text());
+        toast.error("サーバーから不正な応答を受信しました");
+        return;
+      }
+
       const data = (await res.json()) as {
         reply: string;
         affection: number;
