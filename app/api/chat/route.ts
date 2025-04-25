@@ -79,16 +79,16 @@ export async function POST(req: Request) {
       declineRate = 0;
       break;
     case "良い":
-      declineRate = 1;
+      declineRate = 0.1;
       break;
     case "普通":
-      declineRate = 1;
+      declineRate = 0.2;
       break;
     case "悪い":
-      declineRate = 1;
+      declineRate = 0.3;
       break;
     case "非常に悪い":
-      declineRate = 1;
+      declineRate = 0.4;
       break;
     default:
       declineRate = 0;
