@@ -12,6 +12,7 @@ import { Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LogoutDialog from "@/components/logoutDialog";
 import dayjs from "dayjs";
+import DifficultySwitch from "@/components/difficultySwitch";
 
 const SettingsPage = async () => {
   const user = await getAuthUser();
@@ -20,7 +21,7 @@ const SettingsPage = async () => {
   const supabase = await createClient();
   const { data: profile } = await supabase
     .from("profile")
-    .select("last_seen_at")
+    .select("last_seen_at, difficulty")
     .eq("user_id", user.id)
     .single();
 
@@ -45,6 +46,9 @@ const SettingsPage = async () => {
                 })()}
               </p>
             </div>
+          )}
+          {profile?.difficulty && (
+            <DifficultySwitch initial={profile.difficulty} />
           )}
         </CardContent>
       </Card>

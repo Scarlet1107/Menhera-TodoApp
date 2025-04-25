@@ -17,7 +17,14 @@ const HomePage = async () => {
       <div className="p-4 text-red-500">エラー: ユーザーが見つかりません</div>
     );
   }
+
+  const { data: profile } = await supabase
+    .from("profile")
+    .select("difficulty")
+    .eq("user_id", user.id)
+    .single();
   const userId = user.id;
+  const isHard = profile?.difficulty === "hard";
 
   return (
     <div className="relative w-full h-64">
@@ -29,7 +36,7 @@ const HomePage = async () => {
         <AffectionBadge />
       </div>
       <HeraMainImage />
-      <CreateTodoDialog userId={userId} />
+      {!isHard && <CreateTodoDialog userId={userId} />}
       {/* いずれ消す */}
       {/* <Debugger /> */}
     </div>

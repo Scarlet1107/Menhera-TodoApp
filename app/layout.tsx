@@ -54,6 +54,14 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  const { data } = await supabase
+    .from("profile")
+    .select("difficulty")
+    .eq("user_id", user?.id)
+    .single();
+
+  const isHard: boolean = data?.difficulty === "hard";
+
   return (
     <html lang="ja" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
@@ -65,11 +73,11 @@ export default async function RootLayout({
         >
           <main className="min-h-screen flex flex-col items-center">
             <div className="w-full h-14shadow-sm flex items-center justify-end">
-              <HeaderAuth user={user} />
+              <HeaderAuth user={user} isHard={isHard} />
             </div>
             {children}
           </main>
-          {user && <MobileNavigation />}
+          {user && <MobileNavigation isHard={isHard} />}
         </ThemeProvider>
         <Toaster />
       </body>
