@@ -64,7 +64,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <main className="min-h-screen flex flex-col items-center">
-            <div className="w-full h-14shadow-sm flex items-center justify-end mb-4">
+            <div className="w-full h-14shadow-sm flex items-center justify-end">
               <HeaderAuth user={user} />
             </div>
             {children}

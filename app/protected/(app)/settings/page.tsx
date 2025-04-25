@@ -23,7 +23,6 @@ const SettingsPage = async () => {
     .select("last_seen_at")
     .eq("user_id", user.id)
     .single();
-  console.log("profile last seen at", profile?.last_seen_at);
 
   return (
     <div className="p-4 max-w-md mx-auto space-y-6">

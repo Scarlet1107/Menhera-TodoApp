@@ -15,12 +15,12 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { updateAffection } from "../todos/actions";
+import { updateAffection } from "../app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
-import { Router } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-export default function PurchaseAction({
+export default function PurchaseDialog({
   item,
   userId,
 }: {
@@ -29,6 +29,7 @@ export default function PurchaseAction({
     name: string;
     price: number;
     affectionGain: number;
+    contentSrc?: string;
     isComingSoon: boolean;
   };
   userId: string;
@@ -57,7 +58,36 @@ export default function PurchaseAction({
   };
 
   if (item.isComingSoon) {
-    return <Button disabled>準備中</Button>;
+    return (
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button>購入</Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>確認</AlertDialogTitle>
+            <AlertDialogDescription className="flex flex-col items-center">
+              {item.name} を購入しますか？
+              <br />
+              デモ版のため無料でお試しいただけます。
+              {item.contentSrc && (
+                <Image
+                  src={item.contentSrc}
+                  height={200}
+                  width={200}
+                  alt="へらかわってコト！？"
+                  className="-my-4"
+                />
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>キャンセル</AlertDialogCancel>
+            <AlertDialogAction disabled>Coming Soon</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
   }
 
   return (
@@ -67,9 +97,11 @@ export default function PurchaseAction({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>購入の確認</AlertDialogTitle>
+          <AlertDialogTitle>確認</AlertDialogTitle>
           <AlertDialogDescription>
-            {item.name} を {item.price}円 で購入しますか？
+            {item.name} を購入しますか？
+            <br />
+            デモ版のため無料でお試しいただけます。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

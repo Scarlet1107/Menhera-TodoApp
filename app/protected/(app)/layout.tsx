@@ -79,11 +79,17 @@ export default async function ProtectedLayout({
   if (deletedCount && deletedCount > 0) {
     deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
   }
-  console.log("deleteTodoPenaltyText", deleteTodoPenaltyText);
 
   const delta = computeDelta(eventType) - deleteTodoPenalty;
   let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
-  if (newAffection === 0) redirect("/protected/bad-end");
+
+  if (newAffection === 0) {
+    await supabase
+      .from("profile")
+      .update({ affection: newAffection })
+      .eq("user_id", user.id);
+    redirect("/protected/bad-end");
+  }
 
   const nowDate = new Date();
   const { error } = await supabase
@@ -200,7 +206,7 @@ export default async function ProtectedLayout({
   return (
     <>
       <DynamicBackground />
-      <div className="relative z-10 min-w-0 w-full">
+      <div className="relative z-10 min-w-0 w-full mt-4">
         <HeraProvider status={status}>{children}</HeraProvider>
       </div>
     </>

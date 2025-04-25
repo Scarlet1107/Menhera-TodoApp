@@ -48,6 +48,7 @@ export default function BadEndClient({ action }: Props) {
                 width={200}
                 height={200}
                 alt="バッドエンドへらちゃん"
+                className="-mb-12 -mt-4"
               />
             </div>
           </AlertDialogDescription>

@@ -8,11 +8,14 @@ import Link from "next/link";
 export default async function Login(props: { searchParams: Promise<Message> }) {
   const searchParams = await props.searchParams;
   return (
-    <form className="flex-1 flex flex-col min-w-64">
+    <form className="flex-1 flex flex-col min-w-64 mt-4 mx-8">
       <h1 className="text-2xl font-medium">ログイン</h1>
       <p className="text-sm text-foreground">
         アカウントをお持ちでない方は{" "}
-        <Link className="text-foreground font-medium underline" href="/sign-up">
+        <Link
+          className="text-foreground font-medium underline hover:text-blue-500"
+          href="/sign-up"
+        >
           新規登録
         </Link>
         してください。
@@ -23,7 +26,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
         <div className="flex justify-between items-center">
           <Label htmlFor="password">パスワード</Label>
           <Link
-            className="text-xs text-foreground underline"
+            className="text-xs text-foreground underline hover:text-blue-500"
             href="/forgot-password"
           >
             パスワードをお忘れですか？
