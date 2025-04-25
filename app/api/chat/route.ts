@@ -27,6 +27,32 @@ type FunctionArgs =
     }
   | { action: "delete"; id: string };
 
+const declinePhrases: Record<
+  "良い" | "普通" | "悪い" | "非常に悪い",
+  string[]
+> = {
+  良い: [
+    "ごめん、ちょっと手が離せなくて…",
+    "今ちょっとムリかも、ごめんね…",
+    "うーん、今日はパスさせてほしい…",
+  ],
+  普通: [
+    "ごめん、今あんまり気分よくなくて…",
+    "ちょっとしんどいかも…ごめん",
+    "今あまり乗れないかも…ごめんね",
+  ],
+  悪い: [
+    "ムリかもしれない、ごめん…",
+    "今日はちょっと無理そう…",
+    "ごめん、できそうにない…",
+  ],
+  非常に悪い: [
+    "ごめん、本当に今は無理…",
+    "助けられない、ごめんなさい…",
+    "全然気分が戻らなくて…ごめんね",
+  ],
+};
+
 export async function POST(req: Request) {
   const { messages } = (await req.json()) as { messages: ChatMessage[] };
 
@@ -67,8 +93,14 @@ export async function POST(req: Request) {
     default:
       declineRate = 0;
   }
-  if (Math.random() < declineRate) {
-    return NextResponse.json({ reply: "ごめん、今ちょっと…" }, { status: 200 });
+  if (Math.random() < declineRate && mood !== "最高") {
+    const phrases = declinePhrases[mood];
+    const randomReply = phrases[Math.floor(Math.random() * phrases.length)];
+    // 断り時も同じ形で返す
+    return NextResponse.json(
+      { reply: randomReply, affection, delta: 0 },
+      { status: 200 }
+    );
   }
 
   // 未完了 Todo を取得
@@ -94,7 +126,7 @@ export async function POST(req: Request) {
 - ユーザーの“彼女”として Todo 管理を手伝う
 - 好感度（affection）に応じて反応が変化する
 - 返答は短め（30文字以内）でお願いします
-- 期限について入力がなければ24時間後に設定してください
+- 期限について入力がなければ48時間後に設定してください
 
 次のツールを提供します。  
 ツール名: manage_todo  
@@ -163,6 +195,7 @@ export async function POST(req: Request) {
         .from("profile")
         .update({ affection: newAffection })
         .eq("user_id", user.id);
+      affection = newAffection;
     };
 
     // create

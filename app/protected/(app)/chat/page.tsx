@@ -40,10 +40,10 @@ export default function ChatPage() {
   const send = async () => {
     if (!input.trim()) return;
     const userMsg: Message = { role: "user", content: input };
-    const newHistory = [...history, userMsg];
+    const newHistory = [...history, userMsg].slice(-5);
     setHistory(newHistory);
     setInput("");
-    const messages = newHistory.slice(-5);
+    const messages = newHistory;
 
     try {
       const res = await fetch("/api/chat", {
