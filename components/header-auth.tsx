@@ -41,7 +41,7 @@ export default function Header({ user }: Props) {
 
   return (
     <header className="w-full border-b bg-pink-50/80 dark:bg-stone-800/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between">
-      <Link href="/protected/home">
+      <Link href="/">
         <Image
           src="/header-icon.png"
           height={150}
@@ -50,7 +50,7 @@ export default function Header({ user }: Props) {
         />
       </Link>
 
-      {user ? (
+      {user && (
         <>
           <nav className="hidden sm:flex gap-4 ml-8">
             {tabs.map(({ href, icon, label }) => {
@@ -74,22 +74,11 @@ export default function Header({ user }: Props) {
               );
             })}
           </nav>
-
-          {/* 共通：ThemeSwitcher */}
-          <div className="flex items-center gap-4 ml-auto text-sm">
-            <ThemeSwitcher />
-          </div>
         </>
-      ) : (
-        <div className="flex gap-2 text-sm ml-auto">
-          <Button asChild size="sm" variant="outline">
-            <Link href="/sign-in">ログイン</Link>
-          </Button>
-          <Button asChild size="sm" variant="default">
-            <Link href="/sign-up">新規登録</Link>
-          </Button>
-        </div>
       )}
+      <div className="flex items-center gap-4 ml-auto text-sm">
+        <ThemeSwitcher />
+      </div>
     </header>
   );
 }

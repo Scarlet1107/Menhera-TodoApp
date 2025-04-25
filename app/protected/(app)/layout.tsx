@@ -199,7 +199,7 @@ export default async function ProtectedLayout({
   return (
     <>
       <DynamicBackground />
-      <div className="relative z-10 min-w-0 w-full">
+      <div className="relative z-10 min-w-0 w-full mt-4">
         <HeraProvider status={status}>{children}</HeraProvider>
       </div>
     </>

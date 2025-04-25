@@ -27,11 +27,14 @@ export default async function Signup(props: {
 
   return (
     <>
-      <form className="flex flex-col min-w-64 mx-auto">
+      <form className="flex flex-col min-w-64 mx-auto mt-4">
         <h1 className="text-2xl font-medium">新規登録</h1>
         <p className="text-sm text text-foreground">
           すでにアカウントをお持ちですか？
-          <Link className="text-primary font-medium underline" href="/sign-in">
+          <Link
+            className="text-primary font-medium underline hover:text-blue-500"
+            href="/sign-in"
+          >
             ログイン
           </Link>
         </p>
