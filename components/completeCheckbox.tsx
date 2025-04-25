@@ -50,9 +50,13 @@ export const CompleteCheckbox: React.FC<Props> = ({
       // 好感度更新 (+3 or -4)
       const delta = newChecked ? 3 : -4;
       await updateAffection(userId, delta);
-      const msg = getActionMessage(newChecked ? "complete" : "uncomplete", affection + delta);
+      const msg = getActionMessage(
+        newChecked ? "complete" : "uncomplete",
+        affection + delta
+      );
+      const newAffection = Math.min(100, Math.max(0, affection + delta));
       setHeraStatus({
-        affection: affection + delta,
+        affection: newAffection,
         delta: delta,
         message: msg,
       });

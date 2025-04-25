@@ -22,6 +22,6 @@ export async function updateAffection(userId: string, delta: number) {
   // プロフィール更新
   await supabase
     .from("profile")
-    .update({ affection: newAffection })
+    .update({ affection: newAffection, last_active: new Date().toISOString() })
     .eq("user_id", userId);
 }

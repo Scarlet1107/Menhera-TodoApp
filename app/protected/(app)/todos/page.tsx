@@ -21,7 +21,6 @@ import { CompleteCheckbox } from "@/components/completeCheckbox";
 import { EditTodoDialog } from "@/components/ui/editTodoDialog";
 import { DeleteTodoButton } from "@/components/deleteTodoButton";
 import HeraMessage from "@/components/heraMessage";
-import { AffectionBadge } from "@/components/affectionBadge";
 import HeraIconImage from "@/components/heraIconImage";
 
 dayjs.extend(utc);

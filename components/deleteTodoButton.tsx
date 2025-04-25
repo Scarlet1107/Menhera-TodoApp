@@ -47,8 +47,9 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
       const delta = -5;
       await updateAffection(userId, delta);
       const msg = getActionMessage("delete" as HeraAction, affection);
+      const newAffection = Math.min(100, Math.max(0, affection + delta));
       setHeraStatus({
-        affection: affection + delta,
+        affection: newAffection,
         delta: delta,
         message: msg,
       });
