@@ -41,7 +41,7 @@ export default function HeraMainImage({
   const { src, alt } = moodToImage[mood];
 
   return (
-    <div className="absolute bottom-0 left-1/3 transform -translate-x-1/2">
+    <div className="absolute bottom-0 left-1/3 transform -translate-x-1/2 -mb-12 md:mb-0">
       <Image src={src} alt={alt} width={width} height={height} />
     </div>
   );
