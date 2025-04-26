@@ -27,7 +27,7 @@ const HomePage = async () => {
   const isHard = profile?.difficulty === "hard";
 
   return (
-    <div className="relative w-full h-64">
+    <div className="relative w-full h-screen">
       {/* ヘラちゃんのメッセージ部分 */}
       <div className="mx-4">
         <HeraMessage />
