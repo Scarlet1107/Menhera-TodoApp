@@ -1,104 +1,103 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# ❤️ メンヘラTodoアプリ - Menhera Todo App
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+🏆 2025年4月26日 Gitty Hackathon 優勝作品
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
 
-## Features
+[![発表スライド](/public/thumbnail.png)](https://www.canva.com/design/DAGlnrczHFA/_fC-ibxb_e-rWKJIEqgdGQ/view?utm_content=DAGlnrczHFA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=habe77a4daf)
+[Canvaでスライドを開く](https://www.canva.com/design/DAGlnrczHFA/_fC-ibxb_e-rWKJIEqgdGQ/view?utm_content=DAGlnrczHFA&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=habe77a4daf)
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+## 【日本語】
 
-## Demo
+### 🌟 アプリについて
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+* 毎日ログインすると好感度が上がります。
+* ログインをサボると好感度が下がり、ヘラちゃんにTodoを勝手に編集・削除されることがあります。
+* 好感度が0になると、包丁を持ったヘラちゃんが近づいてきて...
+* ショップでプリンなどのスイーツを買うと好感度がアップします。
+* 普通のTodoアプリとしても問題なく使えます。(仕事など大事なTodo管理には使わないでください。自己責任でお願いします)
 
-## Deploy to Vercel
+「何かがおかしいTodoアプリ」というハッカソンテーマをもとに開発された、Todoアプリです。
 
-Vercel deployment will guide you through creating a Supabase account and project.
+ユーザーのTodo達成アクションに対してキャラクター「ヘラちゃん」が反応し、女の子の感情を上手く統合しながら、ゆるいホラーをとしても、ちょっとゲームとしても楽しめる体験型アプリです。
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### 📱 アクセス
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+* 本番URL: [https://menhera-todo.scarlet7.net/](https://menhera-todo.scarlet7.net/)
+* 日本語対応。英語化はREADMEのみ
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### 👥 チーム
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+* scarlet (dev / planning)
+* kuru (illustration / message design)
+* 描き下ろし絵: **20枚**
+* ヘラちゃんのメッセージ: **約100種類**
+* 表情差分: **5段階**
 
-## Clone and run locally
+### 🌐 技術構成
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+| 部分      | 技術/サービス                              |
+| ------- | ------------------------------------ |
+| フロント    | Next.js v15 (App Router + AppDir)    |
+| バックエンド  | Supabase (DB & Auth)                 |
+| デプロイ    | AWS Amplify                          |
+| UIライブラリ | Shadcn/ui + Tailwind CSS             |
+| メール     | Resend (認証メール送信)                     |
+| テンプレ    | Supabase Starter template (@ Vercel) |
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### 🔥 ハードモード（もっと遊びたい人向け）
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+* ハードモードをONにすると、Todoの手動作成・削除・編集ができなくなります。
+* 代わりに、チャットでヘラちゃんに「お願い」して操作してもらう必要があります。
+* ただし、ヘラちゃんの機嫌によっては断られることも…。
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+---
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+## 【English】
 
-3. Use `cd` to change into the app's directory
+### 🌟 About the App
 
-   ```bash
-   cd with-supabase-app
-   ```
+* Logging in daily increases your affection level.
+* Skipping logins may lead to affection loss, or even Hera-chan secretly editing or deleting your Todos.
+* When your affection hits 0, Hera-chan may appear… with a knife.
+* Buying pudding and other sweets in the in-app shop increases her affection.
+* And yes, you can still use this app as a perfectly normal Todo app.
 
-4. Rename `.env.example` to `.env.local` and update the following:
+This is a "something's off" style Todo App built for a hackathon. It features an emotional virtual girl character named **Hera-chan**, who reacts to your actions in various *intense* ways.
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+Manage your tasks—but beware. If you miss your deadline or delete a task, **she might get hurt... or worse**.
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+### 📱 Access
 
-5. You can now run the Next.js local development server:
+* Live: [https://menhera-todo.scarlet7.net/](https://menhera-todo.scarlet7.net/)
+* Japanese only for now (English only in README)
 
-   ```bash
-   npm run dev
-   ```
+### 👥 Team
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+* **scarlet** (dev, planner)
+* **kuru** (illustration, message designer)
+* 20 custom illustrations
+* \~100 original text messages
+* 5 stages
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+### 🌐 Tech Stack
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+| Part          | Stack/Service              |
+| ------------- | -------------------------- |
+| Frontend      | Next.js v15 (App Router)   |
+| Backend       | Supabase (Postgres + Auth) |
+| Deploy        | AWS Amplify                |
+| UI            | Shadcn UI + Tailwind CSS   |
+| Email         | Resend (for Auth Emails)   |
+| Template Base | Supabase Starter (Vercel)  |
 
-## Feedback and issues
+### 🔥 Hard Mode (For Hardcore Users)
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+* In Hard Mode, you can't manually create, delete, or edit your Todos.
+* Instead, you must politely *ask* Hera-chan via chat to do it for you.
+* Beware: her mood may cause her to reject your request.
 
-## More Supabase examples
+---
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+> Built with obsession. Use with caution.
+
+---
