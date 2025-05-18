@@ -16,17 +16,24 @@ import { toast } from "sonner";
 import Image from "next/image";
 
 interface Props {
-  action: () => Promise<void>;
+  userId: string;
 }
 
-export default function BadEndClient({ action }: Props) {
+export default function BadEndClient({ userId }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => setOpen(true), []);
 
   const onDelete = async () => {
-    await action();
+    const resp = await fetch("/api/profile/delete/", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await resp.json();
+    if (!data.success) {
+      console.log("削除エラー", data);
+    }
     toast("さよなら…君と過ごした時間、忘れないよ…💔");
     router.push("/");
   };
