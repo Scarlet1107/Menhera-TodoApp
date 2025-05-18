@@ -1,0 +1,20 @@
+{
+    "short_name": "メンヘラTodo",
+    "name": "メンヘラTodo-面倒なTodo管理をメンヘラのへらちゃんと一緒に",
+    "start_url": "/protected/home/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#fdf2f8",
+    "icons": [
+        {
+            "src": "/hera-chan/pwa/192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/hera-chan/pwa/512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
