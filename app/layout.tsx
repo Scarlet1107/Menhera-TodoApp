@@ -12,7 +12,15 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
+
+// スマホで画面の拡大を防ぐ
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export const metadata: Metadata = {
   title: "メンヘラTodoアプリ",
@@ -25,10 +33,10 @@ export const metadata: Metadata = {
     url: "https://menhera-todo.scarlet7.net/",
     images: [
       {
-        url: "/opengraph.png",
+        url: "https://menhera-todo.scarlet7.net/opengraph.png",
         width: 1200,
         height: 630,
-        alt: "メンヘラTodoアプリ Open Graph 画像",
+        alt: "メンヘラTodoアプリ Ope Graph 画像",
       },
     ],
     siteName: "メンヘラTodoアプリ",

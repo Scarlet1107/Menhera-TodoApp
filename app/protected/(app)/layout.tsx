@@ -143,7 +143,7 @@ export default async function ProtectedLayout({
       const pick = todos[Math.floor(Math.random() * todos.length)];
       const newTitle =
         ONE_DAY_GAP_REPLACE_OPTIONS[
-          Math.floor(Math.random() * ONE_DAY_GAP_REPLACE_OPTIONS.length)
+        Math.floor(Math.random() * ONE_DAY_GAP_REPLACE_OPTIONS.length)
         ];
       await supabase
         .from("todo")
@@ -174,7 +174,7 @@ export default async function ProtectedLayout({
     if (isPositive) {
       const title =
         ANNIVERSARY_PRESENT_OPTIONS[
-          Math.floor(Math.random() * ANNIVERSARY_PRESENT_OPTIONS.length)
+        Math.floor(Math.random() * ANNIVERSARY_PRESENT_OPTIONS.length)
         ];
       await supabase.from("todo").insert({
         user_id: user.id,

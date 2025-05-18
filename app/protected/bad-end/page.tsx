@@ -1,8 +1,8 @@
 // File: app/protected/bad-end/page.tsx
 import { redirect } from "next/navigation";
-import { supabaseAdmin } from "@/utils/supabase/admin";
 import BadEndClient from "../../../components/deleteAccountDialog";
 import { createClient } from "@/utils/supabase/server";
+
 
 export default async function BadEndPage() {
   // サーバーコンポーネントで認証チェック
@@ -27,16 +27,5 @@ export default async function BadEndPage() {
     redirect("/protected/home");
   }
 
-  // サーバーアクション: Service Roleキーで削除
-  async function handleDelete() {
-    "use server";
-    await supabaseAdmin.from("todo").delete().eq("user_id", userId);
-    await supabaseAdmin.from("profile").delete().eq("user_id", userId);
-    await supabaseAdmin.auth.admin.deleteUser(userId);
-  }
-
-  return <BadEndClient action={handleDelete} />;
-}
-function single() {
-  throw new Error("Function not implemented.");
+  return <BadEndClient userId={user.id} />;
 }
