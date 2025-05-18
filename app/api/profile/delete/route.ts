@@ -13,11 +13,8 @@ export async function DELETE() {
   const userId = user.id;
 
   // RLS バイパスして削除
-  const todoDeleteRes = await authClient.from("todo").delete().eq("user_id", userId);
-  console.log("todo delete res =", todoDeleteRes);
-
-  const profileDeleteRes = await authClient.from("profile").delete().eq("user_id", userId);
-  console.log("profile delete res =", profileDeleteRes);
+  await authClient.from("todo").delete().eq("user_id", userId);
+  await authClient.from("profile").delete().eq("user_id", userId);
   const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
   if (deleteError) {
     return NextResponse.json({ error: deleteError.message }, { status: 500 });

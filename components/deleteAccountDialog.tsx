@@ -36,6 +36,7 @@ export default function BadEndClient({ userId }: Props) {
     }
     toast("さよなら…君と過ごした時間、忘れないよ…💔");
     router.push("/");
+    router.refresh();
   };
 
   return (
