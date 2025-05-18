@@ -1,6 +1,7 @@
 {
+    "name": "メンヘラTodo",
     "short_name": "メンヘラTodo",
-    "name": "メンヘラTodo-面倒なTodo管理をメンヘラのへらちゃんと一緒に",
+    "description": "面倒なTodo管理をメンヘラのへらちゃんと一緒に",
     "start_url": "/protected/home/",
     "display": "standalone",
     "background_color": "#ffffff",
