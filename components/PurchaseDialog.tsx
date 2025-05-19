@@ -69,7 +69,7 @@ export default function PurchaseDialog({
             <AlertDialogDescription className="flex flex-col items-center">
               {item.name} を購入しますか？
               <br />
-              デモ版のため無料でお試しいただけます。
+              {/* デモ版のため無料でお試しいただけます。 */}
               {item.contentSrc && (
                 <Image
                   src={item.contentSrc}

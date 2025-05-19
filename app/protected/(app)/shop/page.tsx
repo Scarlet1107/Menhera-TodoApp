@@ -13,20 +13,20 @@ const shopItems = [
   {
     id: "pudding",
     name: "プリン",
-    price: 100,
+    price: 99999,
     affectionGain: 10,
     imgSrc: "/shop/pudding.png",
     alt: "プリン",
-    isComingSoon: false,
+    isComingSoon: true,
   },
   {
     id: "cake",
     name: "ケーキ",
-    price: 200,
+    price: 99999,
     affectionGain: 30,
     imgSrc: "/shop/cake.png",
     alt: "ケーキ",
-    isComingSoon: false,
+    isComingSoon: true,
   },
   {
     id: "chikawa",
@@ -78,7 +78,7 @@ export default async function Page() {
               <div className="text-sm mb-1">
                 <span className="line-through">{formatPrice(item.price)}</span>
                 <br />
-                <span>→ 無料 (デモ版)</span>
+                {/* <span>→ 無料 (デモ版)</span> */}
               </div>
               {!item.isComingSoon && (
                 <div className="text-xs text-gray-500">
