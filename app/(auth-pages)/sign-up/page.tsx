@@ -51,8 +51,11 @@ export default async function Signup(props: {
             minLength={6}
             required
           />
+          <Link href="/terms" target="_blank" className="underline text-sm">
+            利用規約はこちら
+          </Link>
           <SubmitButton formAction={signUpAction} pendingText="登録中...">
-            登録
+            利用規約に同意して登録
           </SubmitButton>
           <FormMessage message={searchParams} />
         </div>
