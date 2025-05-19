@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description:
     "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
   openGraph: {
-    title: "メンヘラTodoアプリ",
+    title: "メンヘラTodo",
     description:
       "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
     url: "https://menhera-todo.scarlet7.net/",
@@ -35,15 +35,15 @@ export const metadata: Metadata = {
         url: "https://menhera-todo.scarlet7.net/opengraph.png",
         width: 1200,
         height: 630,
-        alt: "メンヘラTodoアプリ Ope Graph 画像",
+        alt: "メンヘラTodoアプリ Open Graph 画像",
       },
     ],
-    siteName: "メンヘラTodoアプリ",
+    siteName: "メンヘラTodo",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "メンヘラTodoアプリ",
+    title: "メンヘラTodo",
     description:
       "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
     images: ["/opengraph.png"],
