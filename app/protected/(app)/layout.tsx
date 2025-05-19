@@ -196,9 +196,9 @@ export default async function ProtectedLayout({
 
   // 最終メッセージ組み立て
   let message = baseMessage;
-  if (annivText) message += `\n\n${annivText}`;
-  if (todoActionText) message += `\n\n${todoActionText}`;
-  if (deleteTodoPenaltyText) message += `\n\n${deleteTodoPenaltyText}`;
+  if (annivText) message += `\n${annivText}`;
+  if (todoActionText) message += `\n${todoActionText}`;
+  if (deleteTodoPenaltyText) message += `\n${deleteTodoPenaltyText}`;
 
   const status: HeraStatus = {
     affection: newAffection,
@@ -211,7 +211,7 @@ export default async function ProtectedLayout({
   return (
     <>
       <DynamicBackground />
-      <div className="relative z-10 min-w-0 w-full mt-4">
+      <div className="z-10 min-w-0 w-full pt-4">
         <HeraProvider status={status}>{children}</HeraProvider>
       </div>
     </>

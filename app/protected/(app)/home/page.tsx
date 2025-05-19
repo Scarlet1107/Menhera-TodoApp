@@ -1,10 +1,8 @@
 import React from "react";
 import HeraMessage from "@/components/heraMessage";
 import { AffectionBadge } from "@/components/affectionBadge";
-import { useHera } from "@/lib/hera/context";
 import { CreateTodoDialog } from "@/components/createTodoDialog";
 import { createClient } from "@/utils/supabase/server";
-import Debugger from "@/components/debugger";
 import HeraMainImage from "@/components/heraMainImage";
 
 const HomePage = async () => {
@@ -27,7 +25,7 @@ const HomePage = async () => {
   const isHard = profile?.difficulty === "hard";
 
   return (
-    <div className="relative w-full h-screen">
+    <div className="relative w-full h-full flex-1">
       {/* ヘラちゃんのメッセージ部分 */}
       <div className="mx-4">
         <HeraMessage />

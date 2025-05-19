@@ -53,7 +53,7 @@ export default function Header({ user, isHard }: Props) {
   }
 
   return (
-    <header className="w-full border-b bg-pink-50/80 dark:bg-stone-800/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between">
+    <header className="w-full border-b bg-pink-50/80 dark:bg-stone-700/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between sm:py-8">
       <Link href="/">
         <Image
           src="/header-icon.png"
@@ -75,10 +75,10 @@ export default function Header({ user, isHard }: Props) {
                   key={href}
                   href={href}
                   className={cn(
-                    "flex items-center gap-1 text-sm px-2 py-1.5 rounded-md transition-colors",
+                    "flex items-center gap-1 text-sm px-2 py-1.5 rounded-md transition-colors ",
                     isActive
-                      ? "bg-pink-100 text-pink-600"
-                      : "text-gray-500 hover:bg-pink-100 hover:text-pink-600"
+                      ? "text-pink-500 dark:text-pink-400 font-semibold bg-white"
+                      : "dark:text-white text-gray-600 hover:dark:bg-white hover:dark:text-pink-500"
                   )}
                 >
                   {icon}
