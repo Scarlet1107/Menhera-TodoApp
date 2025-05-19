@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default async function Home() {
   return (
-    <div className="w-screen flex flex-col items-center justify-center min-h-screen p-6 bg-pink-50 dark:bg-stone-800 transition-colors">
+    <div className="w-full flex flex-col items-center justify-center min-h-screen bg-pink-50 dark:bg-stone-800 transition-colors">
       <div className="relative w-64 h-64 md:w-96 md:h-96 mb-6 -mt-24">
         <Image
           src="/hera-chan/welcome/good.png"

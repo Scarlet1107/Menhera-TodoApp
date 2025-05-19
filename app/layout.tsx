@@ -89,7 +89,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <main className="min-h-screen flex flex-col items-center">
-            <div className="w-full h-14shadow-sm flex items-center justify-end">
+            <div className="w-full h-14 shadow-sm flex items-center justify-end">
               <HeaderAuth user={user} isHard={isHard} />
             </div>
             {children}
