@@ -44,6 +44,7 @@ const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 80 }) => {
   const background = moodColorMap[mood];
   const shadow = moodShadowMap[mood];
   const font = moodFontMap[mood];
+  const textSize = message.length > 50 ? "text-sm" : "text-base md:text-lg";
 
   const intensity = Math.max(0, Math.min(shakeIntensity, 10));
   const offset = intensity * 0.2; // 揺れの強さを調整できる
@@ -76,7 +77,7 @@ const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 80 }) => {
 
   return (
     <div
-      className={`p-4 rounded-xl md:text-lg whitespace-pre-wrap transition-all duration-300 ${background} ${shadow} ${font} shadow-md`}
+      className={`z-50 p-4 relative rounded-xl whitespace-pre-wrap transition-all duration-300 ${background} ${shadow} ${font} ${textSize} shadow-md`}
     >
       <motion.span animate={controls} className="inline-block">
         {displayedText}

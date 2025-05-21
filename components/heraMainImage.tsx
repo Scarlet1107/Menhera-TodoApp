@@ -23,26 +23,26 @@ const moodToImage: Record<HeraMood, { src: string; alt: string }> = {
   },
 };
 
-type HeraMainImageProps = {
-  /** 画像の幅 (px) */
-  width?: number;
-  /** 画像の高さ (px) */
-  height?: number;
-};
-
 /**
  * 好感度からムードを判定し、対応するヘラちゃん画像を表示するコンポーネント
  */
-export default function HeraMainImage({
-  width = 300,
-  height = 400,
-}: HeraMainImageProps) {
+export default function HeraMainImage() {
   const { mood } = useHera();
   const { src, alt } = moodToImage[mood];
 
   return (
-    <div className="absolute bottom-0 left-1/3 transform -translate-x-1/2 -mb-12 md:mb-0">
-      <Image src={src} alt={alt} width={width} height={height} />
+    <div
+      className="
+    fixed left-1/2 bottom-0 transform -translate-x-2/3
+    w-[400px] h-[500px]
+    sm:w-[420px] sm:h-[520px]
+    md:w-[450px] md:h-[550px]
+    lg:w-[550px] lg:h-[600px]
+    xl:w-[600px] xl:h-[650px]
+    2xl:w-[650px] 2xl:h-[700px]
+  "
+    >
+      <Image src={src} alt={alt} fill className="object-contain" />
     </div>
   );
 }

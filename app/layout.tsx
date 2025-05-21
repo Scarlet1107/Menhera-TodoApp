@@ -1,7 +1,6 @@
 import HeaderAuth from "@/components/header-auth";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import Link from "next/link";
 import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 import { MobileNavigation } from "@/components/mobileNavigation";
@@ -23,11 +22,11 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: "メンヘラTodoアプリ",
+  title: "メンヘラTodo",
   description:
     "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
   openGraph: {
-    title: "メンヘラTodoアプリ",
+    title: "メンヘラTodo",
     description:
       "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
     url: "https://menhera-todo.scarlet7.net/",
@@ -36,15 +35,15 @@ export const metadata: Metadata = {
         url: "https://menhera-todo.scarlet7.net/opengraph.png",
         width: 1200,
         height: 630,
-        alt: "メンヘラTodoアプリ Ope Graph 画像",
+        alt: "メンヘラTodoアプリ Open Graph 画像",
       },
     ],
-    siteName: "メンヘラTodoアプリ",
+    siteName: "メンヘラTodo",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "メンヘラTodoアプリ",
+    title: "メンヘラTodo",
     description:
       "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
     images: ["/opengraph.png"],
@@ -72,6 +71,16 @@ export default async function RootLayout({
 
   return (
     <html lang="ja" className={geistSans.className} suppressHydrationWarning>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/pwa/192x192.png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/pwa/512x512.png" sizes="512x512" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+      </head>
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
@@ -80,7 +89,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <main className="min-h-screen flex flex-col items-center">
-            <div className="w-full h-14shadow-sm flex items-center justify-end">
+            <div className="w-full h-14 shadow-sm flex items-center justify-end">
               <HeaderAuth user={user} isHard={isHard} />
             </div>
             {children}
