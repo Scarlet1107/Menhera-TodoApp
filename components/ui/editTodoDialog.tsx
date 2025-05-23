@@ -71,7 +71,7 @@ export const EditTodoDialog: React.FC<EditProps> = ({
       // 締切を延ばしたときだけペナルティ
       const isExtended = newDateOnly > originalDateOnly;
       if (isExtended) {
-        const delta = -3;
+        const delta = -4;
         await updateAffection(todo.user_id, delta);
         const msg = getActionMessage("edit" as HeraAction, affection);
         setHeraStatus({

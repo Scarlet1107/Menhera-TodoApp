@@ -79,14 +79,16 @@ export default async function ProtectedLayout({
     .eq("completed", false)
     .lt("deadline", nowUTCforQuery);
   if (delError) console.error("期限切れTodo削除エラー", delError);
-  const deleteTodoPenalty = (deletedCount ?? 0) * 5;
+  const deleteTodoPenalty = (deletedCount ?? 0) * 8;
   let deleteTodoPenaltyText = "";
   if (deletedCount && deletedCount > 0) {
     deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
   }
 
+  // Todo: updateAffection関数で処理をまとめたい
+  // Bad-Endに行く際に、確実にaffectionを0にしてからルーティングする必要があるので注意
   const delta = computeDelta(eventType) - deleteTodoPenalty;
-  let newAffection = Math.max(0, Math.min(100, profile.affection + delta));
+  const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
   if (newAffection === 0) {
     await supabase
