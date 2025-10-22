@@ -44,7 +44,7 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
     if (error) {
       toast.error("削除に失敗しました");
     } else {
-      const delta = -5;
+      const delta = -6;
       await updateAffection(userId, delta);
       const msg = getActionMessage("delete" as HeraAction, affection);
       const newAffection = Math.min(100, Math.max(0, affection + delta));

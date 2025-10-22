@@ -47,8 +47,8 @@ export const CompleteCheckbox: React.FC<Props> = ({
       setChecked(!newChecked);
       toast.error("タスクの状態更新に失敗しました");
     } else {
-      // 好感度更新 (+3 or -4)
-      const delta = newChecked ? 3 : -4;
+      // 好感度更新 (+2 or -5)
+      const delta = newChecked ? 2 : -5;
       await updateAffection(userId, delta);
       const msg = getActionMessage(
         newChecked ? "complete" : "uncomplete",

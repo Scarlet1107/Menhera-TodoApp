@@ -87,9 +87,15 @@ export default async function TodosPage() {
                     </CardDescription>
                   </CardHeader>
                   {todo.description && (
-                    <CardContent>{todo.description}</CardContent>
+                    <CardContent>
+                      <pre className="font-sans text-base break-words whitespace-pre-wrap">
+                        {todo.description}
+                      </pre>
+                    </CardContent>
                   )}
-                  <div className={`absolute ${todo.description ? "bottom-6" : "bottom-2"}  right-4`}>
+                  <div
+                    className={`absolute ${todo.description ? "bottom-6" : "bottom-2"}  right-4`}
+                  >
                     <CompleteCheckbox
                       id={todo.id}
                       completed={todo.completed}
@@ -99,13 +105,17 @@ export default async function TodosPage() {
                   </div>
                   {!isHard && (
                     <>
-                      <div className={`absolute ${todo.description ? "top-4" : "top-2"} right-16`}>
+                      <div
+                        className={`absolute ${todo.description ? "top-4" : "top-2"} right-16`}
+                      >
                         <EditTodoDialog
                           todo={todo}
                           updateAffection={updateAffection}
                         />
                       </div>
-                      <div className={`absolute ${todo.description ? "top-4" : "top-2"} right-4`}>
+                      <div
+                        className={`absolute ${todo.description ? "top-4" : "top-2"} right-4`}
+                      >
                         <DeleteTodoButton
                           todoId={todo.id}
                           userId={userId}
@@ -133,7 +143,11 @@ export default async function TodosPage() {
                   <CardDescription>完了済み</CardDescription>
                 </CardHeader>
                 {todo.description && (
-                  <CardContent>{todo.description}</CardContent>
+                  <CardContent className="whitespace-pre-line break-words">
+                    <pre className="font-sans text-base break-words whitespace-pre-wrap">
+                      {todo.description}
+                    </pre>
+                  </CardContent>
                 )}
                 <div className="absolute bottom-4 right-4">
                   <CompleteCheckbox
