@@ -16,6 +16,7 @@ datasource db {
 
 model Profile {
   userId     String     @id @map("user_id") @db.Uuid
+  name       String     @default("名無しのヘラ民")
   affection  Int        @default(70)
   lastSeenAt DateTime?  @map("last_seen_at")
   lastActive DateTime?  @map("last_active")
@@ -26,7 +27,7 @@ model Profile {
 }
 
 model Todo {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   userId      String   @map("user_id") @db.Uuid
   title       String
   description String?

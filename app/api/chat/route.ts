@@ -1,6 +1,9 @@
 export const runtime = "nodejs";
 // app/api/chat/route.ts
 
+// 廃止
+// 旧ハードモードの残骸
+
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import OpenAI from "openai";
@@ -18,13 +21,13 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 type FunctionArgs =
   | { action: "create"; title: string; description?: string; deadline: string }
   | {
-      action: "update";
-      id: string;
-      title?: string;
-      description?: string;
-      deadline?: string;
-      completed?: boolean;
-    }
+    action: "update";
+    id: string;
+    title?: string;
+    description?: string;
+    deadline?: string;
+    completed?: boolean;
+  }
   | { action: "delete"; id: string };
 
 const declinePhrases: Record<

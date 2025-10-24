@@ -31,14 +31,13 @@ export const updateSession = async (request: NextRequest) => {
         },
       }
     );
+    const { error } = await supabase.auth.getClaims();
 
-    const user = await supabase.auth.getUser();
-
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
+    if (request.nextUrl.pathname.startsWith("/protected") && error) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
-    if (request.nextUrl.pathname === "/" && !user.error) {
+    if (request.nextUrl.pathname === "/" && !error) {
       return NextResponse.redirect(new URL("/protected/home", request.url));
     }
 

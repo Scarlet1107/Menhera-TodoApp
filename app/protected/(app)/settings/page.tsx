@@ -1,29 +1,17 @@
 // app/protected/settings/page.tsx (Server Component)
-import React from "react";
-import { Metadata } from "next";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
-import { getAuthUser } from "@/utils/supabase/getAuthUser";
-import { DEFAULT_USER_NAME } from "@/constants/default";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import LogoutDialog from "@/components/logoutDialog";
 import dayjs from "dayjs";
-import DifficultySwitch from "@/components/difficultySwitch";
+import { getUserProfile } from "@/utils/supabase/getUserProfile";
+import { DEFAULT_USER_NAME } from "@/constants/default";
+import { UpdateDisplayNameForm } from "@/components/updateDisplayNameForm";
+import { Label } from "@/components/ui/label";
 
 const SettingsPage = async () => {
-  const user = await getAuthUser();
-  const displayName = user.user_metadata?.display_name ?? DEFAULT_USER_NAME;
-
-  const supabase = await createClient();
-  const { data: profile } = await supabase
-    .from("profile")
-    .select("last_seen_at, difficulty")
-    .eq("user_id", user.id)
-    .single();
+  const profile = await getUserProfile();
 
   return (
     <div className="p-4 max-w-md mx-auto space-y-6">
@@ -32,16 +20,15 @@ const SettingsPage = async () => {
           <CardTitle>アカウント情報</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="displayName">ユーザー名</Label>
-            <Input id="displayName" value={displayName} readOnly />
-          </div>
-          {profile?.last_seen_at && (
+          <UpdateDisplayNameForm
+            initialName={profile.name ?? DEFAULT_USER_NAME}
+          />
+          {profile?.lastSeenAt && (
             <div>
               <Label>最終ログイン</Label>
               <p className="text-sm text-gray-600">
                 {(() => {
-                  const jst = dayjs.utc(profile.last_seen_at).tz("Asia/Tokyo");
+                  const jst = dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo");
                   return jst.format("YYYY/MM/DD HH:mm");
                 })()}
               </p>
