@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   title: "メンヘラTodo",
   description:
     "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
+  metadataBase: new URL("https://menhera-todo.scarlet7.net"),
   openGraph: {
     title: "メンヘラTodo",
     description:
