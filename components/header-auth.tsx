@@ -4,19 +4,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { User } from "@supabase/supabase-js";
+import { JwtPayload, User } from "@supabase/supabase-js";
 import {
   Home,
   Settings,
   ShoppingBag,
   ListTodo,
-  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 type Props = {
-  user: User | null;
+  user: JwtPayload | null;
 };
 
 export default function Header({ user }: Props) {

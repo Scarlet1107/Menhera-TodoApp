@@ -20,6 +20,19 @@ import {
 } from "@/constants/presents";
 import DynamicBackground from "@/components/dynamicBackground";
 
+const getRandomItem = <T,>(items: T[]): T => {
+  if (!items.length) {
+    throw new Error("Cannot pick a random item from an empty array.");
+  }
+  const cryptoObj = globalThis.crypto;
+  if (cryptoObj?.getRandomValues) {
+    const buffer = new Uint32Array(1);
+    cryptoObj.getRandomValues(buffer);
+    return items[buffer[0] % items.length];
+  }
+  return items[0];
+};
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(isBetween);
@@ -142,11 +155,8 @@ export default async function ProtectedLayout({
       .select("id,title")
       .eq("user_id", user.id);
     if (todos?.length) {
-      const pick = todos[Math.floor(Math.random() * todos.length)];
-      const newTitle =
-        ONE_DAY_GAP_REPLACE_OPTIONS[
-        Math.floor(Math.random() * ONE_DAY_GAP_REPLACE_OPTIONS.length)
-        ];
+      const pick = getRandomItem(todos);
+      const newTitle = getRandomItem(ONE_DAY_GAP_REPLACE_OPTIONS);
       await supabase
         .from("todo")
         .update({
@@ -162,7 +172,7 @@ export default async function ProtectedLayout({
       .select("id")
       .eq("user_id", user.id);
     if (todos?.length) {
-      const pick = todos[Math.floor(Math.random() * todos.length)];
+      const pick = getRandomItem(todos);
       await supabase.from("todo").delete().eq("id", pick.id);
       todoActionText =
         "それとやること多すぎちゃったかな?なかなか会いに来てくれないからTodo1つ消しちゃったよ。これで毎日来てくれるよね？";
@@ -174,10 +184,7 @@ export default async function ProtectedLayout({
     const isPositive =
       eventType === "continuous_active" || eventType === "continuous_inactive";
     if (isPositive) {
-      const title =
-        ANNIVERSARY_PRESENT_OPTIONS[
-        Math.floor(Math.random() * ANNIVERSARY_PRESENT_OPTIONS.length)
-        ];
+      const title = getRandomItem(ANNIVERSARY_PRESENT_OPTIONS);
       await supabase.from("todo").insert({
         user_id: user.id,
         title,

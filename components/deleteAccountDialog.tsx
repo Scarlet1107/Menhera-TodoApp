@@ -1,7 +1,7 @@
 // File: app/protected/bad-end/BadEndClient.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AlertDialog,
@@ -20,10 +20,8 @@ interface Props {
 }
 
 export default function BadEndClient({ userId }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const router = useRouter();
-
-  useEffect(() => setOpen(true), []);
 
   const onDelete = async () => {
     const resp = await fetch("/api/profile/delete/", {

@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "npx eslint ."
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",
@@ -42,6 +43,8 @@
     "@types/react-dom": "19.0.2",
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
+    "eslint": "^9.38.0",
+    "eslint-config-next": "^16.0.0",
     "postcss": "^8.4.49",
     "prisma": "^6.6.0",
     "tailwind-animate": "^0.2.10",

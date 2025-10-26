@@ -9,35 +9,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Laptop, Moon, Sun } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
 
-  // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
+    // next-themes はクライアントでのみテーマが確定するため、
+    // ハイドレーションずれを防ぐ目的でマウント後に描画する
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   const ICON_SIZE = 16;
+  const currentTheme =
+    theme === "system" ? resolvedTheme ?? "system" : theme ?? resolvedTheme ?? "system";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size={"sm"}>
-          {theme === "light" ? (
+          {currentTheme === "light" ? (
             <Sun
               key="light"
               size={ICON_SIZE}
               className={"text-muted-foreground"}
             />
-          ) : theme === "dark" ? (
+          ) : currentTheme === "dark" ? (
             <Moon
               key="dark"
               size={ICON_SIZE}
@@ -54,7 +56,7 @@ const ThemeSwitcher = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-content" align="start">
         <DropdownMenuRadioGroup
-          value={theme}
+          value={theme ?? "system"}
           onValueChange={(e) => setTheme(e)}
         >
           <DropdownMenuRadioItem className="flex gap-2" value="light">

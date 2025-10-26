@@ -2,7 +2,6 @@ import HeaderAuth from "@/components/header-auth";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { createClient } from "@/utils/supabase/server";
 import { MobileNavigation } from "@/components/mobileNavigation";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -12,6 +11,9 @@ const geistSans = Geist({
 });
 
 import { Metadata, Viewport } from "next";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 // スマホで画面の拡大を防ぐ
 export const viewport: Viewport = {
@@ -56,11 +58,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // const { user } = await getUserClaims();
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims || null;
 
   // const { data } = await supabase
   //   .from("profile")
@@ -81,8 +83,7 @@ export default async function RootLayout({
       <body className="bg-background text-foreground">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="system" enableSystem
           disableTransitionOnChange
         >
           <main className="min-h-screen flex flex-col items-center">

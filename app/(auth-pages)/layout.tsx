@@ -1,4 +1,4 @@
-import { createClient } from "@/utils/supabase/server";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 import { redirect } from "next/navigation";
 
 export default async function Layout({
@@ -6,14 +6,11 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  // Check if the user is already logged in
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user) {
-    redirect("/protected/home");
-  }
+  // // Check if the user is already logged in
+  // const { user } = await getUserClaims();
+  // if (user) {
+  //   redirect("/protected/home");
+  // }
   return (
     <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
   );

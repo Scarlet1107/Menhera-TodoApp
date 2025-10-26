@@ -13,13 +13,17 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const { setHeraStatus } = useHera();
-  const [history, setHistory] = useState<Message[]>([]);
-
-  // 初回マウント時に localStorage から履歴を復元
-  useEffect(() => {
-    const raw = localStorage.getItem("chatHistory");
-    if (raw) setHistory(JSON.parse(raw));
-  }, []);
+  const [history, setHistory] = useState<Message[]>(() => {
+    if (typeof window === "undefined") return [];
+    const raw = window.localStorage.getItem("chatHistory");
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch (error) {
+      console.error("Failed to parse chat history", error);
+      return [];
+    }
+  });
 
   // Strict Mode での二重書き込みを防ぐ
   const isFirstSave = useRef(true);
