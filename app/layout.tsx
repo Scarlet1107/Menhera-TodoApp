@@ -62,13 +62,13 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data } = await supabase
-    .from("profile")
-    .select("difficulty")
-    .eq("user_id", user?.id)
-    .single();
+  // const { data } = await supabase
+  //   .from("profile")
+  //   .select("difficulty")
+  //   .eq("user_id", user?.id)
+  //   .single();
 
-  const isHard: boolean = data?.difficulty === "hard";
+  // const isHard: boolean = data?.difficulty === "hard";
 
   return (
     <html lang="ja" className={geistSans.className} suppressHydrationWarning>
@@ -88,11 +88,11 @@ export default async function RootLayout({
         >
           <main className="min-h-screen flex flex-col items-center">
             <div className="w-full h-14 shadow-sm flex items-center justify-end">
-              <HeaderAuth user={user} isHard={isHard} />
+              <HeaderAuth user={user} />
             </div>
             {children}
           </main>
-          {user && <MobileNavigation isHard={isHard} />}
+          {user && <MobileNavigation />}
         </ThemeProvider>
         <Toaster />
       </body>

@@ -11,18 +11,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Props = {
-  isHard: boolean;
-};
-// サーバーコンポーネントで実装したかった;;
-// サーバーコンポーネントだとisActiveがうまく動かない
-export const MobileNavigation = ({ isHard }: Props) => {
+export const MobileNavigation = () => {
   const tabs: { href: string; icon: typeof Home; label: string }[] = [
     { href: "/protected/home", icon: Home, label: "ホーム" },
     { href: "/protected/todos", icon: ListTodo, label: "Todos" },
-    ...(isHard
-      ? [{ href: "/protected/chat", icon: MessageSquare, label: "チャット" }]
-      : []),
     { href: "/protected/shop", icon: ShoppingBag, label: "ショップ" },
     { href: "/protected/settings", icon: Settings, label: "設定" },
   ];

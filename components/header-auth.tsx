@@ -17,10 +17,9 @@ import Image from "next/image";
 
 type Props = {
   user: User | null;
-  isHard: boolean;
 };
 
-export default function Header({ user, isHard }: Props) {
+export default function Header({ user }: Props) {
   const tabs = [
     {
       href: "/protected/home",
@@ -44,13 +43,6 @@ export default function Header({ user, isHard }: Props) {
     },
   ];
   const pathname = usePathname();
-  if (isHard) {
-    tabs.push({
-      href: "/protected/chat",
-      icon: <MessageSquare className="w-4 h-4" />,
-      label: "チャット",
-    });
-  }
 
   return (
     <header className="w-full border-b bg-pink-50/80 dark:bg-stone-700/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between sm:py-8">
