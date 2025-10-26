@@ -7,7 +7,6 @@ import {
   Settings,
   ShoppingBag,
   ListTodo,
-  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
