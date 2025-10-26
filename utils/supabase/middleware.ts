@@ -31,7 +31,7 @@ export const updateSession = async (request: NextRequest) => {
         },
       }
     );
-    const { data, error } = await supabase.auth.getClaims();
+    const { data } = await supabase.auth.getClaims();
 
     if (request.nextUrl.pathname.startsWith("/protected") && data?.claims == null) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
