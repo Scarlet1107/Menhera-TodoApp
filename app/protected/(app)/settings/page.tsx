@@ -1,4 +1,5 @@
 // app/protected/settings/page.tsx (Server Component)
+import { Suspense } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Key } from "lucide-react";
@@ -9,38 +10,18 @@ import { getUserProfile } from "@/utils/supabase/getUserProfile";
 import { DEFAULT_USER_NAME } from "@/constants/default";
 import { UpdateDisplayNameForm } from "@/components/updateDisplayNameForm";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const SettingsPage = async () => {
-  const profile = await getUserProfile();
-
+const SettingsPage = () => {
   return (
     <div className="p-4 max-w-md mx-auto space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>アカウント情報</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <UpdateDisplayNameForm
-            initialName={profile.name ?? DEFAULT_USER_NAME}
-          />
-          {profile?.lastSeenAt && (
-            <div>
-              <Label>最終ログイン</Label>
-              <p className="text-sm text-gray-600">
-                {(() => {
-                  const jst = dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo");
-                  return jst.format("YYYY/MM/DD HH:mm");
-                })()}
-              </p>
-            </div>
-          )}
-          {/* {profile?.difficulty && (
-            <DifficultySwitch
-              initial={profile.difficulty}
-              userId={profile.userId}
-            />
-          )} */}
-        </CardContent>
+        <Suspense fallback={<AccountInfoSkeleton />}>
+          <AccountInfo />
+        </Suspense>
       </Card>
 
       <Card>
@@ -65,5 +46,50 @@ const SettingsPage = async () => {
     </div>
   );
 };
+
+async function AccountInfo() {
+  const profile = await getUserProfile();
+
+  return (
+    <CardContent className="space-y-4">
+      <UpdateDisplayNameForm
+        initialName={profile.name ?? DEFAULT_USER_NAME}
+      />
+      {profile?.lastSeenAt && (
+        <div>
+          <Label>最終ログイン</Label>
+          <p className="text-sm text-gray-600">
+            {(() => {
+              const jst = dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo");
+              return jst.format("YYYY/MM/DD HH:mm");
+            })()}
+          </p>
+        </div>
+      )}
+      {/* {profile?.difficulty && (
+        <DifficultySwitch
+          initial={profile.difficulty}
+          userId={profile.userId}
+        />
+      )} */}
+    </CardContent>
+  );
+}
+
+function AccountInfoSkeleton() {
+  return (
+    <CardContent className="space-y-4">
+      <div className="space-y-2">
+        <Label>ユーザー名</Label>
+        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton className="h-10 w-full rounded-md" />
+      </div>
+      <div className="space-y-1">
+        <Label>最終ログイン</Label>
+        <Skeleton className="h-4 w-40" />
+      </div>
+    </CardContent>
+  );
+}
 
 export default SettingsPage;
