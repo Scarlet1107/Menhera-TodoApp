@@ -9,6 +9,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { getHeraMood } from "@/lib/state";
 import { validate as isUuid } from "uuid";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -17,13 +18,13 @@ type ChatMessage = { role: "system" | "user" | "assistant"; content: string };
 type FunctionArgs =
   | { action: "create"; title: string; description?: string; deadline: string }
   | {
-      action: "update";
-      id: string;
-      title?: string;
-      description?: string;
-      deadline?: string;
-      completed?: boolean;
-    }
+    action: "update";
+    id: string;
+    title?: string;
+    description?: string;
+    deadline?: string;
+    completed?: boolean;
+  }
   | { action: "delete"; id: string };
 
 const declineMessages = [
@@ -40,17 +41,18 @@ export async function POST(req: Request) {
 
   // Supabase 認証
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user)
+  let userId: string;
+  try {
+    ({ userId } = await getUserClaims({ redirectOnFail: false }));
+  } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   // 好感度→ムード→拒否判定
   const { data: prof } = await supabase
     .from("profile")
     .select("affection")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
   const affection = prof?.affection ?? 0;
   const mood = getHeraMood(affection);
@@ -63,7 +65,7 @@ export async function POST(req: Request) {
   const { data: todoList, error: listErr } = await supabase
     .from("todo")
     .select("id,title")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("completed", false);
   if (listErr) console.error("Failed to fetch todo list:", listErr);
   console.log("🔍 todo list:", todoList);
@@ -152,7 +154,7 @@ export async function POST(req: Request) {
         ? dayjs(raw.deadline).toISOString()
         : dayjs().tz("Asia/Tokyo").add(1, "day").hour(9).toISOString();
       await supabase.from("todo").insert({
-        user_id: user.id,
+        user_id: userId,
         title: raw.title,
         description: raw.description ?? null,
         deadline: due,
@@ -169,7 +171,7 @@ export async function POST(req: Request) {
         const { data: matched, error: selErr } = await supabase
           .from("todo")
           .select("id,title")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .eq("completed", false)
           .like("title", `%${targetId}%`)
           .limit(1)
@@ -196,7 +198,7 @@ export async function POST(req: Request) {
           .from("todo")
           .update(upd)
           .eq("id", targetId)
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .select();
         if (updErr) console.error("Todo update failed:", updErr);
       }
@@ -206,7 +208,7 @@ export async function POST(req: Request) {
           .from("todo")
           .delete()
           .eq("id", targetId)
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .select();
         if (delErr) {
           console.error("Todo delete failed:", delErr);

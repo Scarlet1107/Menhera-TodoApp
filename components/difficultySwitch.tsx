@@ -17,9 +17,10 @@ import { createClient } from "@/utils/supabase/client";
 
 interface Props {
   initial: "casual" | "hard";
+  userId: string;
 }
 
-export default function DifficultySwitch({ initial }: Props) {
+export default function DifficultySwitch({ initial, userId }: Props) {
   const [value, setValue] = useState(initial === "hard");
   const [pending, setPending] = useState(false);
   const router = useRouter();
@@ -28,11 +29,10 @@ export default function DifficultySwitch({ initial }: Props) {
     setPending(true);
     const newDifficulty = value ? "casual" : "hard";
     const supabase = await createClient();
-    const user = await supabase.auth.getUser();
     await supabase
       .from("profile")
       .update({ difficulty: newDifficulty })
-      .eq("user_id", user.data.user?.id);
+      .eq("user_id", userId);
     setValue(!value);
     setPending(false);
     router.refresh();

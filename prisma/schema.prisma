@@ -22,6 +22,7 @@ model Profile {
   lastActive DateTime?  @map("last_active")
   todos      Todo[]
   difficulty Difficulty @default(casual)
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("profile")
 }

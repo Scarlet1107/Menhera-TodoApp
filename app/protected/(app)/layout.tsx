@@ -19,6 +19,7 @@ import {
   ONE_DAY_GAP_REPLACE_OPTIONS,
 } from "@/constants/presents";
 import DynamicBackground from "@/components/dynamicBackground";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 
 const getRandomItem = <T,>(items: T[]): T => {
   if (!items.length) {
@@ -43,16 +44,9 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-  if (authError || !user) {
-    redirect("/sign-in");
-  }
+  const { userId } = await getUserClaims();
 
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
-  const createdAt = dayjs(user.created_at).tz("Asia/Tokyo");
 
   const { data: profile, error: profileError } = await supabase
     .from("profile")
@@ -60,15 +54,20 @@ export default async function ProtectedLayout({
       `
       affection,
       lastSeenAt:last_seen_at,
-      lastActive:last_active
+      lastActive:last_active,
+      createdAt:created_at
     `
     )
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .single();
   if (profileError || !profile) {
     console.error("プロフィール取得エラー", profileError);
     redirect("/sign-in");
   }
+
+  const createdAt = profile.createdAt
+    ? dayjs(profile.createdAt).tz("Asia/Tokyo")
+    : today;
 
   const lastSeenAt = profile.lastSeenAt
     ? dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo").startOf("day")
@@ -88,7 +87,7 @@ export default async function ProtectedLayout({
   const { error: delError, count: deletedCount } = await supabase
     .from("todo")
     .delete({ count: "exact" })
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("completed", false)
     .lt("deadline", nowUTCforQuery);
   if (delError) console.error("期限切れTodo削除エラー", delError);
@@ -107,7 +106,7 @@ export default async function ProtectedLayout({
     await supabase
       .from("profile")
       .update({ affection: newAffection })
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
     redirect("/protected/bad-end");
   }
 
@@ -119,7 +118,7 @@ export default async function ProtectedLayout({
       last_seen_at: nowDate,
       last_active: nowDate,
     })
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
   if (error) console.error("プロフィール更新エラー", error);
 
   // 記念日判定
@@ -153,7 +152,7 @@ export default async function ProtectedLayout({
     const { data: todos } = await supabase
       .from("todo")
       .select("id,title")
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
     if (todos?.length) {
       const pick = getRandomItem(todos);
       const newTitle = getRandomItem(ONE_DAY_GAP_REPLACE_OPTIONS);
@@ -170,7 +169,7 @@ export default async function ProtectedLayout({
     const { data: todos } = await supabase
       .from("todo")
       .select("id")
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
     if (todos?.length) {
       const pick = getRandomItem(todos);
       await supabase.from("todo").delete().eq("id", pick.id);
@@ -186,7 +185,7 @@ export default async function ProtectedLayout({
     if (isPositive) {
       const title = getRandomItem(ANNIVERSARY_PRESENT_OPTIONS);
       await supabase.from("todo").insert({
-        user_id: user.id,
+        user_id: userId,
         title,
         description: "私のためにがんばってくれるよね？",
         deadline: dayjs().add(1, "days").toISOString(),

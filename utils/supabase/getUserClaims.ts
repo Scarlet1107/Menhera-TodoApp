@@ -3,6 +3,14 @@ import { createClient } from "@/utils/supabase/server";
 import { JwtPayload } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 
+type GetUserClaimsOptions = {
+  /**
+   * Should the helper redirect to the sign-in page when no claims are found.
+   * API ルートなどリダイレクトできない環境では false を指定してください。
+   */
+  redirectOnFail?: boolean;
+};
+
 /**
  * 認証済みユーザーのJWTクレーム情報とユーザーIDを取得する
  * 
@@ -19,7 +27,9 @@ import { redirect } from "next/navigation";
  * @note サーバーコンポーネント専用 - クライアントサイドでは使用しないでください
  * @note ログイン後のページのみで使用してください
  */
-export const getUserClaims = async (): Promise<{ user: JwtPayload; userId: string }> => {
+export const getUserClaims = async (
+  options: GetUserClaimsOptions = {}
+): Promise<{ user: JwtPayload; userId: string }> => {
   const supabase = await createClient();
   const {
     data,
@@ -30,8 +40,15 @@ export const getUserClaims = async (): Promise<{ user: JwtPayload; userId: strin
   if (error) {
     throw new Error("Failed to get user claims");
   }
+
+  const shouldRedirectOnFail =
+    options.redirectOnFail === undefined ? true : options.redirectOnFail;
+
   if (!user) {
-    redirect("/sign-in");
+    if (shouldRedirectOnFail) {
+      redirect("/sign-in");
+    }
+    throw new Error("No user claims");
   }
   const userId = user.sub;
 

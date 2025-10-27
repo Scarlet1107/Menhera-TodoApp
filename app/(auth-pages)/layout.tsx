@@ -6,11 +6,20 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  // // Check if the user is already logged in
-  // const { user } = await getUserClaims();
-  // if (user) {
-  //   redirect("/protected/home");
-  // }
+  // もしすでにログイン済みの場合、ログイン後のページにリダイレクトする
+  let isAuthenticated = false;
+  try {
+    const { user } = await getUserClaims({ redirectOnFail: false });
+    isAuthenticated = Boolean(user);
+  } catch {
+    // 未ログインの場合はそのままページを表示する
+    isAuthenticated = false;
+  }
+
+  if (isAuthenticated) {
+    redirect("/protected/home");
+  }
+
   return (
     <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
   );

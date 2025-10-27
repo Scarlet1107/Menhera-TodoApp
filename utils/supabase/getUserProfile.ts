@@ -34,7 +34,7 @@ export const getUserProfile = async (
         error: profileError,
     } = await supabase
         .from("profile")
-        .select("user_id, name, last_seen_at, last_active, affection, difficulty")
+        .select("user_id, name, last_seen_at, last_active, affection, difficulty, created_at")
         .eq("user_id", targetUserId)
         .single();
 
@@ -48,7 +48,8 @@ export const getUserProfile = async (
         lastSeenAt: profileData.last_seen_at ? new Date(profileData.last_seen_at) : null,
         lastActive: profileData.last_active ? new Date(profileData.last_active) : null,
         affection: profileData.affection,
-        difficulty: profileData.difficulty
+        difficulty: profileData.difficulty,
+        createdAt: new Date(profileData.created_at),
     };
 
     return profile;

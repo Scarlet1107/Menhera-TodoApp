@@ -2,18 +2,12 @@
 import { redirect } from "next/navigation";
 import BadEndClient from "../../../components/deleteAccountDialog";
 import { createClient } from "@/utils/supabase/server";
-
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 
 export default async function BadEndPage() {
   // サーバーコンポーネントで認証チェック
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    redirect("/sign-in");
-  }
-  const userId = user.id;
+  const { userId } = await getUserClaims();
 
   const { data, error } = await supabase
     .from("profile")
@@ -27,5 +21,5 @@ export default async function BadEndPage() {
     redirect("/protected/home");
   }
 
-  return <BadEndClient userId={user.id} />;
+  return <BadEndClient userId={userId} />;
 }

@@ -1,10 +1,10 @@
 // app/shop/page.tsx (Server Component)
 import React from "react";
-import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
 import { Card, CardTitle } from "@/components/ui/card";
 import PurchaseDialog from "@/components/PurchaseDialog";
 import { formatPrice } from "@/utils/formatPrice";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 
 export const dynamic = "force-dynamic";
 
@@ -59,11 +59,7 @@ const shopItems = [
 ];
 
 export default async function Page() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const userId = user?.id;
+  const { userId } = await getUserClaims();
 
   return (
     <div className="p-4 max-w-md mx-auto mb-24 md:mb-0">
@@ -90,7 +86,7 @@ export default async function Page() {
               )}
             </div>
             <div className="ml-4">
-              <PurchaseDialog item={item} userId={userId!} />
+              <PurchaseDialog item={item} userId={userId} />
             </div>
           </Card>
         ))}

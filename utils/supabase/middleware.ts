@@ -34,10 +34,12 @@ export const updateSession = async (request: NextRequest) => {
     const { data } = await supabase.auth.getClaims();
 
     if (request.nextUrl.pathname.startsWith("/protected") && data?.claims == null) {
+      console.log("middleware: 未認証のためサインインページへリダイレクト");
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
     else if (request.nextUrl.pathname === "/" && data?.claims) {
+      console.log("middleware: すでに認証済みのためホームへリダイレクト");
       return NextResponse.redirect(new URL("/protected/home", request.url));
     }
 

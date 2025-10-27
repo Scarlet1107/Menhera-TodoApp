@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { JwtPayload, User } from "@supabase/supabase-js";
+import { JwtPayload } from "@supabase/supabase-js";
 import {
   Home,
   Settings,

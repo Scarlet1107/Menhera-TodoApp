@@ -2,15 +2,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { supabaseAdmin } from "@/utils/supabase/admin";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 
 export async function DELETE() {
   // 認証チェック
   const authClient = await createClient();
-  const { data: { user }, error: authError } = await authClient.auth.getUser();
-  if (authError || !user) {
+  let userId: string;
+  try {
+    ({ userId } = await getUserClaims({ redirectOnFail: false }));
+  } catch {
     return NextResponse.json({ error: "未認証です" }, { status: 401 });
   }
-  const userId = user.id;
 
   // RLS バイパスして削除
   await authClient.from("todo").delete().eq("user_id", userId);

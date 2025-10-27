@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/card";
 import { updateAffection } from "./actions";
 import { CreateTodoDialog } from "@/components/createTodoDialog";
-import { redirect } from "next/navigation";
 import type { Todo } from "@/lib/hera/types";
 import { CompleteCheckbox } from "@/components/completeCheckbox";
 import { EditTodoDialog } from "@/components/ui/editTodoDialog";
 import { DeleteTodoButton } from "@/components/deleteTodoButton";
 import HeraMessage from "@/components/heraMessage";
 import HeraIconImage from "@/components/heraIconImage";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -32,11 +32,7 @@ dayjs.extend(isBetween);
 
 export default async function TodosPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/sign-in");
-  const userId = user.id;
+  const { userId } = await getUserClaims();
 
   const { data: todos, error } = await supabase
     .from("todo")
@@ -45,13 +41,6 @@ export default async function TodosPage() {
     .order("deadline", { ascending: true });
   if (error)
     return <div className="p-4 text-red-500">エラー: {error.message}</div>;
-
-  const { data: profile } = await supabase
-    .from("profile")
-    .select("difficulty")
-    .eq("user_id", user.id)
-    .single();
-  const isHard = profile?.difficulty === "hard";
 
   const list: Todo[] = todos ?? [];
   const todayStart = dayjs().startOf("day");
@@ -69,7 +58,7 @@ export default async function TodosPage() {
         <HeraIconImage />
         <HeraMessage />
       </div>
-      {!isHard && <CreateTodoDialog userId={userId} />}
+      <CreateTodoDialog userId={userId} />
       <Tabs defaultValue="active" className="mt-4">
         <TabsList className="w-full max-w-3xl mx-auto">
           <TabsTrigger value="active">未完了</TabsTrigger>
@@ -88,7 +77,7 @@ export default async function TodosPage() {
                   </CardHeader>
                   {todo.description && (
                     <CardContent>
-                      <pre className="font-sans text-base break-words whitespace-pre-wrap">
+                      <pre className="font-sans text-base wrap-break-word whitespace-pre-wrap">
                         {todo.description}
                       </pre>
                     </CardContent>
@@ -103,27 +92,25 @@ export default async function TodosPage() {
                       updateAffection={updateAffection}
                     />
                   </div>
-                  {!isHard && (
-                    <>
-                      <div
-                        className={`absolute ${todo.description ? "top-4" : "top-2"} right-16`}
-                      >
-                        <EditTodoDialog
-                          todo={todo}
-                          updateAffection={updateAffection}
-                        />
-                      </div>
-                      <div
-                        className={`absolute ${todo.description ? "top-4" : "top-2"} right-4`}
-                      >
-                        <DeleteTodoButton
-                          todoId={todo.id}
-                          userId={userId}
-                          updateAffection={updateAffection}
-                        />
-                      </div>
-                    </>
-                  )}
+                  <>
+                    <div
+                      className={`absolute ${todo.description ? "top-4" : "top-2"} right-16`}
+                    >
+                      <EditTodoDialog
+                        todo={todo}
+                        updateAffection={updateAffection}
+                      />
+                    </div>
+                    <div
+                      className={`absolute ${todo.description ? "top-4" : "top-2"} right-4`}
+                    >
+                      <DeleteTodoButton
+                        todoId={todo.id}
+                        userId={userId}
+                        updateAffection={updateAffection}
+                      />
+                    </div>
+                  </>
                 </Card>
               ))
             ) : (
@@ -143,8 +130,8 @@ export default async function TodosPage() {
                   <CardDescription>完了済み</CardDescription>
                 </CardHeader>
                 {todo.description && (
-                  <CardContent className="whitespace-pre-line break-words">
-                    <pre className="font-sans text-base break-words whitespace-pre-wrap">
+                  <CardContent className="whitespace-pre-line wrap-break-word">
+                    <pre className="font-sans text-base wrap-break-word whitespace-pre-wrap">
                       {todo.description}
                     </pre>
                   </CardContent>

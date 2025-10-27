@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { MobileNavigation } from "@/components/mobileNavigation";
 import { Toaster } from "@/components/ui/sonner";
+import type { JwtPayload } from "@supabase/supabase-js";
 
 const geistSans = Geist({
   display: "swap",
@@ -12,8 +13,6 @@ const geistSans = Geist({
 
 import { Metadata, Viewport } from "next";
 import { getUserClaims } from "@/utils/supabase/getUserClaims";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 
 // スマホで画面の拡大を防ぐ
 export const viewport: Viewport = {
@@ -59,10 +58,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  // const { user } = await getUserClaims();
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims || null;
+  let user: JwtPayload | null = null;
+  try {
+    ({ user } = await getUserClaims({ redirectOnFail: false }));
+  } catch {
+    user = null;
+  }
 
   // const { data } = await supabase
   //   .from("profile")

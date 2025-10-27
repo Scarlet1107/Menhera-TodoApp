@@ -35,7 +35,10 @@ const SettingsPage = async () => {
             </div>
           )}
           {/* {profile?.difficulty && (
-            <DifficultySwitch initial={profile.difficulty} />
+            <DifficultySwitch
+              initial={profile.difficulty}
+              userId={profile.userId}
+            />
           )} */}
         </CardContent>
       </Card>
