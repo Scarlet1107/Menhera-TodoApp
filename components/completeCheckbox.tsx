@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
 import { getActionMessage } from "@/lib/hera/actionMessage";
+import { useAppMode } from "@/components/appModeProvider";
 
 interface Props {
   id: Todo["id"];
@@ -29,6 +30,7 @@ export const CompleteCheckbox: React.FC<Props> = ({
   const [checked, setChecked] = useState<boolean>(completed);
   const [loading, setLoading] = useState<boolean>(false);
   const { affection, setHeraStatus } = useHera();
+  const { mode } = useAppMode();
 
   const handleCheckboxChange = async (newChecked: boolean) => {
     // Optimistic UI update
@@ -48,13 +50,15 @@ export const CompleteCheckbox: React.FC<Props> = ({
       toast.error("タスクの状態更新に失敗しました");
     } else {
       // 好感度更新 (+2 or -5)
-      const delta = newChecked ? 2 : -5;
+      const rawDelta = newChecked ? 2 : -5;
+      const delta =
+        mode === "dark" && rawDelta < 0 ? rawDelta * 2 : rawDelta;
       await updateAffection(userId, delta);
+      const newAffection = Math.min(100, Math.max(0, affection + delta));
       const msg = getActionMessage(
         newChecked ? "complete" : "uncomplete",
-        affection + delta
+        newAffection
       );
-      const newAffection = Math.min(100, Math.max(0, affection + delta));
       setHeraStatus({
         affection: newAffection,
         delta: delta,

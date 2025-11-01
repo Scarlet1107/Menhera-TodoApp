@@ -24,6 +24,7 @@ import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 import { toJstDateString, jstDateStringToUtcIso } from "@/utils/date";
+import { useAppMode } from "@/components/appModeProvider";
 
 type EditProps = { todo: Todo; updateAffection: UpdateAffectionFn };
 export const EditTodoDialog: React.FC<EditProps> = ({
@@ -43,6 +44,7 @@ export const EditTodoDialog: React.FC<EditProps> = ({
   const [date, setDate] = useState<string>(initialDateJst);
   const [loading, setLoading] = useState(false);
   const { affection, setHeraStatus } = useHera();
+  const { mode } = useAppMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,11 +73,13 @@ export const EditTodoDialog: React.FC<EditProps> = ({
       // 締切を延ばしたときだけペナルティ
       const isExtended = newDateOnly > originalDateOnly;
       if (isExtended) {
-        const delta = -4;
+        const rawDelta = -4;
+        const delta = mode === "dark" ? rawDelta * 2 : rawDelta;
         await updateAffection(todo.user_id, delta);
-        const msg = getActionMessage("edit" as HeraAction, affection);
+        const newAffection = Math.min(100, Math.max(0, affection + delta));
+        const msg = getActionMessage("edit" as HeraAction, newAffection);
         setHeraStatus({
-          affection: affection + delta,
+          affection: newAffection,
           delta: delta,
           message: msg,
         });

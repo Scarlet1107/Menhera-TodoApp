@@ -20,6 +20,7 @@ import { Trash2 } from "lucide-react";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 import { useHera } from "@/lib/hera/context";
+import { useAppMode } from "@/components/appModeProvider";
 
 // Props for deletion button
 export type DeleteTodoProps = {
@@ -37,6 +38,7 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
   const supabase = createClient();
   const router = useRouter();
   const { affection, setHeraStatus } = useHera();
+  const { mode } = useAppMode();
 
   const handleDelete = async () => {
     setLoading(true);
@@ -44,10 +46,11 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
     if (error) {
       toast.error("削除に失敗しました");
     } else {
-      const delta = -6;
+      const rawDelta = -6;
+      const delta = mode === "dark" ? rawDelta * 2 : rawDelta;
       await updateAffection(userId, delta);
-      const msg = getActionMessage("delete" as HeraAction, affection);
       const newAffection = Math.min(100, Math.max(0, affection + delta));
+      const msg = getActionMessage("delete" as HeraAction, newAffection);
       setHeraStatus({
         affection: newAffection,
         delta: delta,

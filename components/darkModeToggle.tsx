@@ -29,11 +29,6 @@ export function DarkModeToggle() {
     setPending(true);
     try {
       await setMode(nextMode);
-      toast.success(
-        nextMode === "dark"
-          ? "ダークモードに切り替えました。"
-          : "ノーマルモードに戻しました。"
-      );
     } catch {
       toast.error("モードの更新に失敗しました。時間を空けて再度お試しください。");
     } finally {
