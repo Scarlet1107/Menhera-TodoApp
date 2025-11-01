@@ -20,6 +20,7 @@ import {
 } from "@/constants/presents";
 import DynamicBackground from "@/components/dynamicBackground";
 import { getUserClaims } from "@/utils/supabase/getUserClaims";
+import { getUserProfile } from "@/utils/supabase/getUserProfile";
 
 const getRandomItem = <T,>(items: T[]): T => {
   if (!items.length) {
@@ -47,23 +48,9 @@ export default async function ProtectedLayout({
   const { userId } = await getUserClaims();
 
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
+  const profile = await getUserProfile(userId);
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profile")
-    .select(
-      `
-      affection,
-      lastSeenAt:last_seen_at,
-      lastActive:last_active,
-      createdAt:created_at
-    `
-    )
-    .eq("user_id", userId)
-    .single();
-  if (profileError || !profile) {
-    console.error("プロフィール取得エラー", profileError);
-    redirect("/sign-in");
-  }
+  const isDarkMode = profile.mode === "dark";
 
   const createdAt = profile.createdAt
     ? dayjs(profile.createdAt).tz("Asia/Tokyo")
@@ -83,23 +70,30 @@ export default async function ProtectedLayout({
     today,
   });
 
-  const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
-  const { error: delError, count: deletedCount } = await supabase
-    .from("todo")
-    .delete({ count: "exact" })
-    .eq("user_id", userId)
-    .eq("completed", false)
-    .lt("deadline", nowUTCforQuery);
-  if (delError) console.error("期限切れTodo削除エラー", delError);
-  const deleteTodoPenalty = (deletedCount ?? 0) * 8;
+  let deleteTodoPenalty = 0;
   let deleteTodoPenaltyText = "";
-  if (deletedCount && deletedCount > 0) {
-    deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
+  if (isDarkMode) {
+    const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
+    const { error: delError, count: deletedCount } = await supabase
+      .from("todo")
+      .delete({ count: "exact" })
+      .eq("user_id", userId)
+      .eq("completed", false)
+      .lt("deadline", nowUTCforQuery);
+    if (delError) console.error("期限切れTodo削除エラー", delError);
+    deleteTodoPenalty = (deletedCount ?? 0) * 8;
+    if (deletedCount && deletedCount > 0) {
+      deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
+    }
   }
 
   // Todo: updateAffection関数で処理をまとめたい
   // Bad-Endに行く際に、確実にaffectionを0にしてからルーティングする必要があるので注意
-  const delta = computeDelta(eventType) - deleteTodoPenalty;
+  const baseDelta = computeDelta(eventType);
+  const scaledDelta =
+    isDarkMode && baseDelta < 0 ? baseDelta * 2 : baseDelta;
+  const penalty = isDarkMode ? deleteTodoPenalty * 2 : 0;
+  const delta = scaledDelta - penalty;
   const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
   if (newAffection === 0) {
@@ -148,7 +142,7 @@ export default async function ProtectedLayout({
   let todoActionText = "";
 
   // ギャップ系アクション
-  if (eventType === "one_day_gap") {
+  if (isDarkMode && eventType === "one_day_gap") {
     const { data: todos } = await supabase
       .from("todo")
       .select("id,title")
@@ -165,7 +159,7 @@ export default async function ProtectedLayout({
         .eq("id", pick.id);
       todoActionText = `それとなかなかTodoを進めてくれないから君のTodoを「${newTitle}」に書き換えておいたよ。私のためにがんばってくれる？`;
     }
-  } else if (eventType === "multi_day_gap") {
+  } else if (isDarkMode && eventType === "multi_day_gap") {
     const { data: todos } = await supabase
       .from("todo")
       .select("id")

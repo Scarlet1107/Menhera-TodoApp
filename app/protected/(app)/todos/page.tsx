@@ -38,7 +38,7 @@ export default function TodosPage() {
         <HeraIconImage />
         <HeraMessage />
       </div>
-      <Suspense fallback={<CreateTodoButtonSkeleton />}>
+      <Suspense fallback={null}>
         <CreateTodoDialogLoader />
       </Suspense>
       <Suspense fallback={<TodosSkeleton />}>

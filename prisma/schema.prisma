@@ -15,14 +15,14 @@ datasource db {
 }
 
 model Profile {
-  userId     String     @id @map("user_id") @db.Uuid
-  name       String     @default("名無しのヘラ民")
-  affection  Int        @default(70)
-  lastSeenAt DateTime?  @map("last_seen_at")
-  lastActive DateTime?  @map("last_active")
+  userId     String    @id @map("user_id") @db.Uuid
+  name       String    @default("名無しのヘラ民")
+  affection  Int       @default(70)
+  lastSeenAt DateTime? @map("last_seen_at")
+  lastActive DateTime? @map("last_active")
   todos      Todo[]
-  difficulty Difficulty @default(casual)
-  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  mode       Mode      @default(normal)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   @@map("profile")
 }
@@ -41,7 +41,7 @@ model Todo {
   @@map("todo")
 }
 
-enum Difficulty {
-  casual
-  hard
+enum Mode {
+  normal
+  dark
 }

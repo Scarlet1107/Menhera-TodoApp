@@ -113,16 +113,16 @@ volatile virtual girlfriend, Hera-chan.
   up—your account is gone!
 - **Shop Purchases**: Buy pudding and sweets to recover affection—but proceed
   with caution.
-- **Normal Mode**: Functions as a standard Todo app; use for serious tasks at
-  your own risk.
+- **Normal Mode**: Functions as a standard Todo app; Hera-chan behaves (relatively) gently.
 
 ---
 
-### 🔥 Hard Mode (Temporarily Disabled)
+### 🌙 Dark Mode (High Difficulty)
 
-- Disables manual Todo creation, editing, and deletion.
-- Must politely ask Hera-chan via chat to manage your tasks.
-- Subject to her mood—and currently unstable, hence disabled.
+- Doubling of all affection penalties when Hera-chan gets upset.
+- Gap logins trigger her meddling with your Todos (edits/deletions).
+- Expired Todos are purged automatically on login.
+- UI switches to a dark theme to match the mood.
 
 ---
 

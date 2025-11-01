@@ -11,6 +11,7 @@ import { DEFAULT_USER_NAME } from "@/constants/default";
 import { UpdateDisplayNameForm } from "@/components/updateDisplayNameForm";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DarkModeToggle } from "@/components/darkModeToggle";
 
 const SettingsPage = () => {
   return (
@@ -55,6 +56,7 @@ async function AccountInfo() {
       <UpdateDisplayNameForm
         initialName={profile.name ?? DEFAULT_USER_NAME}
       />
+      <DarkModeToggle />
       {profile?.lastSeenAt && (
         <div>
           <Label>最終ログイン</Label>
@@ -66,12 +68,6 @@ async function AccountInfo() {
           </p>
         </div>
       )}
-      {/* {profile?.difficulty && (
-        <DifficultySwitch
-          initial={profile.difficulty}
-          userId={profile.userId}
-        />
-      )} */}
     </CardContent>
   );
 }

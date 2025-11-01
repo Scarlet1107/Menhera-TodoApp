@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 import { JwtPayload } from "@supabase/supabase-js";
 import {
   Home,
@@ -55,7 +54,7 @@ export default function Header({ user }: Props) {
 
       {user && (
         <>
-          <nav className="hidden sm:flex gap-4 ml-8">
+          <nav className="hidden sm:flex gap-4 ml-auto pl-8">
             {tabs.map(({ href, icon, label }) => {
               const isActive =
                 pathname === href || pathname.startsWith(href + "/");
@@ -79,9 +78,6 @@ export default function Header({ user }: Props) {
           </nav>
         </>
       )}
-      <div className="flex items-center gap-4 ml-auto text-sm">
-        <ThemeSwitcher />
-      </div>
     </header>
   );
 }
