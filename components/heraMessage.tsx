@@ -46,34 +46,41 @@ const HeraMessage: React.FC<HeraMessageProps> = ({ delay = 80 }) => {
   const font = moodFontMap[mood];
   const textSize = message.length > 50 ? "text-sm" : "text-base md:text-lg";
 
-  const intensity = Math.max(0, Math.min(shakeIntensity, 10));
-  const offset = intensity * 0.2; // 揺れの強さを調整できる
-
   useEffect(() => {
-    setDisplayedText("");
-    let currentIndex = 0;
+    let frameId = 0;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    const interval = setInterval(() => {
-      if (currentIndex >= message.length) {
-        clearInterval(interval);
-        return;
-      }
+    frameId = requestAnimationFrame(() => {
+      setDisplayedText("");
+      let currentIndex = 0;
+      const clampedIntensity = Math.max(0, Math.min(shakeIntensity, 10));
+      const offset = clampedIntensity * 0.2;
 
-      const char = message.charAt(currentIndex);
-      setDisplayedText((prev) => prev + char);
-      if (shakeIntensity > 0) {
-        controls.start({
-          x: [0, -offset, offset, -offset / 2, offset / 2, 0],
-          y: [0, offset / 1.5, -offset / 1.5, offset, -offset, 0],
-          transition: { duration: 0.25, ease: "easeInOut" },
-        });
-      }
+      intervalId = setInterval(() => {
+        if (currentIndex >= message.length) {
+          if (intervalId) clearInterval(intervalId);
+          return;
+        }
 
-      currentIndex += 1;
-    }, delay);
+        const char = message.charAt(currentIndex);
+        setDisplayedText((prev) => prev + char);
+        if (clampedIntensity > 0) {
+          controls.start({
+            x: [0, -offset, offset, -offset / 2, offset / 2, 0],
+            y: [0, offset / 1.5, -offset / 1.5, offset, -offset, 0],
+            transition: { duration: 0.25, ease: "easeInOut" },
+          });
+        }
 
-    return () => clearInterval(interval);
-  }, [message, delay]);
+        currentIndex += 1;
+      }, delay);
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [message, delay, shakeIntensity, controls]);
 
   return (
     <div

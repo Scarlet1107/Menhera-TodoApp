@@ -28,12 +28,12 @@ type HeraIconImageProps = {
 /**
  * 好感度に応じたヘラちゃんアイコンを表示するコンポーネント
  */
-export default function HeraIconImage({}: HeraIconImageProps) {
+export default function HeraIconImage({ }: HeraIconImageProps) {
   const { mood } = useHera();
   const { src, alt } = moodToIcon[mood];
 
   return (
-    <div className="flex-shrink-0">
+    <div className="shrink-0">
       <Image
         src={src}
         alt={alt}

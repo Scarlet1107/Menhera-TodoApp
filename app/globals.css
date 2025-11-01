@@ -4,6 +4,38 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(10);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float {
+    animation: float 2s ease-in-out infinite;
+  }
+}
+@keyframes flip-y {
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+.animate-flip-y {
+  animation: flip-y 2s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

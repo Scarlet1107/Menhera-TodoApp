@@ -1,10 +1,9 @@
 import HeaderAuth from "@/components/header-auth";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import { createClient } from "@/utils/supabase/server";
 import { MobileNavigation } from "@/components/mobileNavigation";
 import { Toaster } from "@/components/ui/sonner";
+import type { JwtPayload } from "@supabase/supabase-js";
 
 const geistSans = Geist({
   display: "swap",
@@ -12,6 +11,10 @@ const geistSans = Geist({
 });
 
 import { Metadata, Viewport } from "next";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
+import { cookies } from "next/headers";
+import { AppMode, DEFAULT_MODE, MODE_COOKIE_NAME } from "@/constants/mode";
+import { AppModeProvider } from "@/components/appModeProvider";
 
 // スマホで画面の拡大を防ぐ
 export const viewport: Viewport = {
@@ -25,6 +28,7 @@ export const metadata: Metadata = {
   title: "メンヘラTodo",
   description:
     "めんどくさくて続かないTodoアプリ、ヘラちゃんと一緒にがんばりませんか?",
+  metadataBase: new URL("https://menhera-todo.scarlet7.net"),
   openGraph: {
     title: "メンヘラTodo",
     description:
@@ -55,48 +59,44 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
+  const cookieStore = await cookies();
+  const cookieMode = cookieStore.get(MODE_COOKIE_NAME)?.value as AppMode | undefined;
+  const initialMode: AppMode =
+    cookieMode === "dark" || cookieMode === "normal" ? cookieMode : DEFAULT_MODE;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data } = await supabase
-    .from("profile")
-    .select("difficulty")
-    .eq("user_id", user?.id)
-    .single();
-
-  const isHard: boolean = data?.difficulty === "hard";
-
+  let user: JwtPayload | null = null;
+  let userId: string | null = null;
+  try {
+    const result = await getUserClaims({ redirectOnFail: false });
+    user = result.user;
+    userId = result.userId;
+  } catch {
+    user = null;
+    userId = null;
+  }
   return (
-    <html lang="ja" className={geistSans.className} suppressHydrationWarning>
+    <html
+      lang="ja"
+      className={`${geistSans.className} ${initialMode === "dark" ? "dark" : ""}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/pwa/192x192.png" sizes="192x192" />
-        <link rel="apple-touch-icon" href="/pwa/512x512.png" sizes="512x512" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="theme-color" content="#ffffff" />
         <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
       </head>
       <body className="bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <AppModeProvider initialMode={initialMode} userId={userId}>
           <main className="min-h-screen flex flex-col items-center">
-            <div className="w-full h-14 shadow-sm flex items-center justify-end">
-              <HeaderAuth user={user} isHard={isHard} />
+            <div className="relative z-50 w-full h-14 shadow-sm flex items-center justify-end">
+              <HeaderAuth user={user} />
             </div>
             {children}
           </main>
-          {user && <MobileNavigation isHard={isHard} />}
-        </ThemeProvider>
-        <Toaster />
+          {user && <MobileNavigation />}
+          <Toaster />
+        </AppModeProvider>
       </body>
     </html>
   );

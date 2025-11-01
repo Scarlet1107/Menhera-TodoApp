@@ -19,6 +19,21 @@ import {
   ONE_DAY_GAP_REPLACE_OPTIONS,
 } from "@/constants/presents";
 import DynamicBackground from "@/components/dynamicBackground";
+import { getUserClaims } from "@/utils/supabase/getUserClaims";
+import { getUserProfile } from "@/utils/supabase/getUserProfile";
+
+const getRandomItem = <T,>(items: T[]): T => {
+  if (!items.length) {
+    throw new Error("Cannot pick a random item from an empty array.");
+  }
+  const cryptoObj = globalThis.crypto;
+  if (cryptoObj?.getRandomValues) {
+    const buffer = new Uint32Array(1);
+    cryptoObj.getRandomValues(buffer);
+    return items[buffer[0] % items.length];
+  }
+  return items[0];
+};
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -30,32 +45,16 @@ export default async function ProtectedLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-  if (authError || !user) {
-    redirect("/sign-in");
-  }
+  const { userId } = await getUserClaims();
 
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
-  const createdAt = dayjs(user.created_at).tz("Asia/Tokyo");
+  const profile = await getUserProfile(userId);
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profile")
-    .select(
-      `
-      affection,
-      lastSeenAt:last_seen_at,
-      lastActive:last_active
-    `
-    )
-    .eq("user_id", user.id)
-    .single();
-  if (profileError || !profile) {
-    console.error("プロフィール取得エラー", profileError);
-    redirect("/sign-in");
-  }
+  const isDarkMode = profile.mode === "dark";
+
+  const createdAt = profile.createdAt
+    ? dayjs(profile.createdAt).tz("Asia/Tokyo")
+    : today;
 
   const lastSeenAt = profile.lastSeenAt
     ? dayjs.utc(profile.lastSeenAt).tz("Asia/Tokyo").startOf("day")
@@ -71,30 +70,37 @@ export default async function ProtectedLayout({
     today,
   });
 
-  const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
-  const { error: delError, count: deletedCount } = await supabase
-    .from("todo")
-    .delete({ count: "exact" })
-    .eq("user_id", user.id)
-    .eq("completed", false)
-    .lt("deadline", nowUTCforQuery);
-  if (delError) console.error("期限切れTodo削除エラー", delError);
-  const deleteTodoPenalty = (deletedCount ?? 0) * 8;
+  let deleteTodoPenalty = 0;
   let deleteTodoPenaltyText = "";
-  if (deletedCount && deletedCount > 0) {
-    deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
+  if (isDarkMode) {
+    const nowUTCforQuery = dayjs().tz("Asia/Tokyo").utc().toISOString();
+    const { error: delError, count: deletedCount } = await supabase
+      .from("todo")
+      .delete({ count: "exact" })
+      .eq("user_id", userId)
+      .eq("completed", false)
+      .lt("deadline", nowUTCforQuery);
+    if (delError) console.error("期限切れTodo削除エラー", delError);
+    deleteTodoPenalty = (deletedCount ?? 0) * 8;
+    if (deletedCount && deletedCount > 0) {
+      deleteTodoPenaltyText = `あと期限切れのTodoが${deletedCount}つあったから消しておいたよ。次は約束守ってね。`;
+    }
   }
 
   // Todo: updateAffection関数で処理をまとめたい
   // Bad-Endに行く際に、確実にaffectionを0にしてからルーティングする必要があるので注意
-  const delta = computeDelta(eventType) - deleteTodoPenalty;
+  const baseDelta = computeDelta(eventType);
+  const scaledDelta =
+    isDarkMode && baseDelta < 0 ? baseDelta * 2 : baseDelta;
+  const penalty = isDarkMode ? deleteTodoPenalty * 2 : 0;
+  const delta = scaledDelta - penalty;
   const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
 
   if (newAffection === 0) {
     await supabase
       .from("profile")
       .update({ affection: newAffection })
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
     redirect("/protected/bad-end");
   }
 
@@ -106,7 +112,7 @@ export default async function ProtectedLayout({
       last_seen_at: nowDate,
       last_active: nowDate,
     })
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
   if (error) console.error("プロフィール更新エラー", error);
 
   // 記念日判定
@@ -136,17 +142,14 @@ export default async function ProtectedLayout({
   let todoActionText = "";
 
   // ギャップ系アクション
-  if (eventType === "one_day_gap") {
+  if (isDarkMode && eventType === "one_day_gap") {
     const { data: todos } = await supabase
       .from("todo")
       .select("id,title")
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
     if (todos?.length) {
-      const pick = todos[Math.floor(Math.random() * todos.length)];
-      const newTitle =
-        ONE_DAY_GAP_REPLACE_OPTIONS[
-        Math.floor(Math.random() * ONE_DAY_GAP_REPLACE_OPTIONS.length)
-        ];
+      const pick = getRandomItem(todos);
+      const newTitle = getRandomItem(ONE_DAY_GAP_REPLACE_OPTIONS);
       await supabase
         .from("todo")
         .update({
@@ -156,13 +159,13 @@ export default async function ProtectedLayout({
         .eq("id", pick.id);
       todoActionText = `それとなかなかTodoを進めてくれないから君のTodoを「${newTitle}」に書き換えておいたよ。私のためにがんばってくれる？`;
     }
-  } else if (eventType === "multi_day_gap") {
+  } else if (isDarkMode && eventType === "multi_day_gap") {
     const { data: todos } = await supabase
       .from("todo")
       .select("id")
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
     if (todos?.length) {
-      const pick = todos[Math.floor(Math.random() * todos.length)];
+      const pick = getRandomItem(todos);
       await supabase.from("todo").delete().eq("id", pick.id);
       todoActionText =
         "それとやること多すぎちゃったかな?なかなか会いに来てくれないからTodo1つ消しちゃったよ。これで毎日来てくれるよね？";
@@ -174,12 +177,9 @@ export default async function ProtectedLayout({
     const isPositive =
       eventType === "continuous_active" || eventType === "continuous_inactive";
     if (isPositive) {
-      const title =
-        ANNIVERSARY_PRESENT_OPTIONS[
-        Math.floor(Math.random() * ANNIVERSARY_PRESENT_OPTIONS.length)
-        ];
+      const title = getRandomItem(ANNIVERSARY_PRESENT_OPTIONS);
       await supabase.from("todo").insert({
-        user_id: user.id,
+        user_id: userId,
         title,
         description: "私のためにがんばってくれるよね？",
         deadline: dayjs().add(1, "days").toISOString(),

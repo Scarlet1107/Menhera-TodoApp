@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 
 export default function Terms() {
     return (
-        <article className="prose prose-pink max-w-none px-6 py-8 dark:prose-invert">
+        <article className="prose prose-pink dark:prose-invert max-w-none px-6 py-8">
 
-            <aside className="bg-pink-50 border-l-4 border-pink-200 p-4 mb-6">
+            <aside className="bg-pink-50 border-l-4 border-pink-200 p-4 mb-6 dark:bg-stone-800/80 dark:border-pink-400/60 dark:text-pink-100">
                 <p>※以下は要約です。本文が正式な規約内容となります。</p>
                 <br />
                 <ul className="list-disc list-inside space-y-2 text-base">

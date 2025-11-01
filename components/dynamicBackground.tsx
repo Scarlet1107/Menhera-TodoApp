@@ -1,28 +1,29 @@
 // components/DynamicBackground.tsx
-"use client";
-
 import Image from "next/image";
+
+
 
 export default function DynamicBackground() {
   return (
-    <div className="fixed inset-0 -z-10">
-      {/* Light */}
+    <div className="fixed inset-0 -z-10 pointer-events-none select-none">
       <Image
         src="/background/noon.png"
-        alt="背景画像"
+        alt=""
         fill
         priority
         sizes="100vw"
-        className="object-cover block dark:hidden select-none pointer-events-none"
+        aria-hidden
+        className="object-cover dark:hidden"
       />
-      {/* Dark */}
       <Image
         src="/background/night.png"
-        alt="背景画像"
+        alt=""
         fill
-        priority
+        loading="lazy"
+        fetchPriority="low"
         sizes="100vw"
-        className="object-cover hidden dark:block select-none pointer-events-none"
+        aria-hidden
+        className="hidden object-cover dark:block"
       />
     </div>
   );

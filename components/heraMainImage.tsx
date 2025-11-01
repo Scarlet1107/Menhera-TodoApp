@@ -42,7 +42,7 @@ export default function HeraMainImage() {
     2xl:w-[650px] 2xl:h-[700px]
   "
     >
-      <Image src={src} alt={alt} fill className="object-contain" />
+      <Image src={src} alt={alt} fill className="object-contain" priority />
     </div>
   );
 }

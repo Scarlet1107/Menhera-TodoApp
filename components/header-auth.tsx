@@ -2,25 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { User } from "@supabase/supabase-js";
+import { JwtPayload } from "@supabase/supabase-js";
 import {
   Home,
   Settings,
   ShoppingBag,
   ListTodo,
-  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 type Props = {
-  user: User | null;
-  isHard: boolean;
+  user: JwtPayload | null;
 };
 
-export default function Header({ user, isHard }: Props) {
+export default function Header({ user }: Props) {
   const tabs = [
     {
       href: "/protected/home",
@@ -44,13 +40,6 @@ export default function Header({ user, isHard }: Props) {
     },
   ];
   const pathname = usePathname();
-  if (isHard) {
-    tabs.push({
-      href: "/protected/chat",
-      icon: <MessageSquare className="w-4 h-4" />,
-      label: "チャット",
-    });
-  }
 
   return (
     <header className="w-full border-b bg-pink-50/80 dark:bg-stone-700/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between sm:py-8">
@@ -65,7 +54,7 @@ export default function Header({ user, isHard }: Props) {
 
       {user && (
         <>
-          <nav className="hidden sm:flex gap-4 ml-8">
+          <nav className="hidden sm:flex gap-4 ml-auto pl-8">
             {tabs.map(({ href, icon, label }) => {
               const isActive =
                 pathname === href || pathname.startsWith(href + "/");
@@ -89,9 +78,6 @@ export default function Header({ user, isHard }: Props) {
           </nav>
         </>
       )}
-      <div className="flex items-center gap-4 ml-auto text-sm">
-        <ThemeSwitcher />
-      </div>
     </header>
   );
 }
