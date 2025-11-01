@@ -15,7 +15,7 @@ import { DarkModeToggle } from "@/components/darkModeToggle";
 
 const SettingsPage = () => {
   return (
-    <div className="p-4 max-w-md mx-auto space-y-6">
+    <div className="p-4 max-w-md mx-auto space-y-6 mb-20">
       <Card>
         <CardHeader>
           <CardTitle>アカウント情報</CardTitle>
