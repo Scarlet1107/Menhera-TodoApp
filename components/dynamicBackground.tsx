@@ -10,7 +10,7 @@ export default function DynamicBackground() {
         src="/background/noon.png"
         alt=""
         fill
-        priority
+        loading="lazy"
         sizes="100vw"
         aria-hidden
         className="object-cover dark:hidden"
