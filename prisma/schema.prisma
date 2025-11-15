@@ -14,34 +14,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// =======================
+// Enums
+// =======================
+
+enum Mode {
+  normal
+  dark
+}
+
+enum TodoDifficulty {
+  easy
+  normal
+  hard
+}
+
+enum ItemCategory {
+  cosmetic // 見た目（前髪・後ろ髪・服）
+  consumable // 消費アイテム（プリン・ケーキなど）
+}
+
+enum ItemSlot {
+  frontHair
+  backHair
+  clothes
+  none
+}
+
+enum CoinLogType {
+  todo_reward // Todo完了報酬
+  anniversary // 記念日ボーナス
+  gacha // ガチャでのコイン消費
+  manual_adjust // 運営用の手動調整など
+}
+
+// =======================
+// Models
+// =======================
+
 model Profile {
-  userId     String    @id @map("user_id") @db.Uuid
-  name       String    @default("名無しのヘラ民")
-  affection  Int       @default(70)
-  lastSeenAt DateTime? @map("last_seen_at")
-  lastActive DateTime? @map("last_active")
-  todos      Todo[]
-  mode       Mode      @default(normal)
-  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  userId    String @id @map("user_id") @db.Uuid
+  name      String @default("名無しのヘラ民")
+  affection Int    @default(70)
+
+  lastSeenAt DateTime? @map("last_seen_at") @db.Timestamptz(6)
+  lastActive DateTime? @map("last_active") @db.Timestamptz(6)
+
+  // メンヘラコイン残高（キャッシュ）
+  menheraCoin Int @default(0) @map("menhera_coin")
+
+  mode      Mode     @default(normal)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // 現在装備している見た目
+  frontHairItemId String? @map("front_hair_item_id") @db.Uuid
+  backHairItemId  String? @map("back_hair_item_id") @db.Uuid
+  clothesItemId   String? @map("clothes_item_id") @db.Uuid
+
+  frontHair Item? @relation("FrontHairItem", fields: [frontHairItemId], references: [id])
+  backHair  Item? @relation("BackHairItem", fields: [backHairItemId], references: [id])
+  clothes   Item? @relation("ClothesItem", fields: [clothesItemId], references: [id])
+
+  todos     Todo[]
+  inventory UserItem[]
+  coinLogs  CoinLog[]
 
   @@map("profile")
 }
 
 model Todo {
-  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
+  id          String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String  @map("user_id") @db.Uuid
   title       String
   description String?
-  deadline    DateTime
-  completed   Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at")
-  profile     Profile  @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  deadline  DateTime @db.Timestamptz(6)
+  completed Boolean  @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // 難易度
+  difficulty TodoDifficulty @default(normal)
+
+  // このTodoの報酬を配布済みか
+  rewardGiven Boolean @default(false) @map("reward_given")
+
+  profile  Profile   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  coinLogs CoinLog[]
 
   @@index([userId])
   @@map("todo")
 }
 
-enum Mode {
-  normal
-  dark
+model Item {
+  id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+
+  key         String  @unique // 画像のファイル名になる想定
+  name        String
+  description String?
+
+  category ItemCategory
+  slot     ItemSlot     @default(none)
+
+  // 消費アイテム用
+  affectionGain Int @default(0) @map("affection_gain")
+
+  // ガチャのベース重み（0でガチャ対象外）
+  gachaWeight Int @default(0) @map("gacha_weight")
+
+  // 1ユーザー1個までのコスメか
+  isUnique Boolean @default(false) @map("is_unique")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  userItems UserItem[]
+  coinLogs  CoinLog[]
+
+  // Profile 側の見た目リレーション逆側
+  frontHairProfiles Profile[] @relation("FrontHairItem")
+  backHairProfiles  Profile[] @relation("BackHairItem")
+  clothesProfiles   Profile[] @relation("ClothesItem")
+
+  @@map("item")
+}
+
+model UserItem {
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  itemId String @map("item_id") @db.Uuid
+
+  quantity   Int      @default(1)
+  acquiredAt DateTime @default(now()) @map("acquired_at") @db.Timestamptz(6)
+
+  profile Profile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  item    Item    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+  @@index([userId])
+  @@index([itemId])
+  @@map("user_item")
+}
+
+model CoinLog {
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  amount Int
+  type   CoinLogType
+
+  todoId String? @map("todo_id") @db.Uuid
+  itemId String? @map("item_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  profile Profile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  todo    Todo?   @relation(fields: [todoId], references: [id])
+  item    Item?   @relation(fields: [itemId], references: [id])
+
+  @@index([userId])
+  @@index([todoId])
+  @@index([itemId])
+  @@map("coin_log")
 }

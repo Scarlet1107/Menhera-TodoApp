@@ -7,7 +7,7 @@
     "lint": "npx eslint ."
   },
   "dependencies": {
-    "@prisma/client": "^6.6.0",
+    "@prisma/client": "^6.19.0",
     "@radix-ui/react-alert-dialog": "^1.1.11",
     "@radix-ui/react-checkbox": "^1.2.3",
     "@radix-ui/react-dialog": "^1.1.11",
@@ -46,7 +46,7 @@
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.3",
     "postcss": "^8.4.49",
-    "prisma": "^6.6.0",
+    "prisma": "^6.19.0",
     "tailwind-animate": "^0.2.10",
     "tailwindcss": "^4.1.4",
     "ts-node": "^10.9.2",
