@@ -110,7 +110,7 @@ model Todo {
 model Item {
   id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
 
-  key         String  @unique // 画像のファイル名になる想定
+  key         String // 画像のファイル名になる想定
   name        String
   description String?
 
@@ -136,6 +136,7 @@ model Item {
   backHairProfiles  Profile[] @relation("BackHairItem")
   clothesProfiles   Profile[] @relation("ClothesItem")
 
+  @@unique([slot, key])
   @@map("item")
 }
 
