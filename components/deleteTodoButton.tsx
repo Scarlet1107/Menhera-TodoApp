@@ -21,16 +21,23 @@ import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 import { useHera } from "@/lib/hera/context";
 import { useAppMode } from "@/components/appModeProvider";
+import type { Todo } from "@/lib/hera/types";
+import {
+  getAffectionDeltaForMode,
+  getModeAdjustedValue,
+  getTodoReward,
+} from "@/constants/todoRewards";
+import { applyCoinChange } from "@/lib/coins/applyCoinChange";
 
 // Props for deletion button
 export type DeleteTodoProps = {
-  todoId: string;
+  todo: Todo;
   userId: string;
   updateAffection: UpdateAffectionFn;
 };
 
 export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
-  todoId,
+  todo,
   userId,
   updateAffection,
 }) => {
@@ -42,20 +49,45 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
 
   const handleDelete = async () => {
     setLoading(true);
-    const { error } = await supabase.from("todo").delete().eq("id", todoId);
+    const { error } = await supabase
+      .from("todo")
+      .delete()
+      .eq("id", todo.id);
     if (error) {
       toast.error("削除に失敗しました");
     } else {
-      const rawDelta = -6;
-      const delta = mode === "dark" ? rawDelta * 2 : rawDelta;
-      await updateAffection(userId, delta);
-      const newAffection = Math.min(100, Math.max(0, affection + delta));
+      const reward = getTodoReward(todo.difficulty, "delete");
+      const affectionDelta = getAffectionDeltaForMode(reward.affection, mode);
+      const coinDelta = getModeAdjustedValue(reward.coins, mode);
+
+      await updateAffection(userId, affectionDelta);
+      const newAffection = Math.min(
+        100,
+        Math.max(0, affection + affectionDelta)
+      );
       const msg = getActionMessage("delete" as HeraAction, newAffection);
       setHeraStatus({
         affection: newAffection,
-        delta: delta,
+        delta: affectionDelta,
         message: msg,
       });
+
+      try {
+        await applyCoinChange({
+          supabase,
+          userId,
+          amount: coinDelta,
+          type: "todo_reward",
+          todoId: todo.id,
+          notificationContent:
+            coinDelta >= 0
+              ? `Todo削除でヘラコインを${coinDelta}枚獲得しました`
+              : `Todo削除でヘラコインを${Math.abs(coinDelta)}枚失いました`,
+        });
+      } catch (coinError) {
+        console.error("コインの更新に失敗", coinError);
+        toast.error("コインの更新に失敗しました");
+      }
       router.refresh();
     }
     setLoading(false);

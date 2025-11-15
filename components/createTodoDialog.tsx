@@ -23,6 +23,16 @@ import { updateAffection } from "@/app/protected/(app)/todos/actions";
 import { useHera } from "@/lib/hera/context";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 import { toJstDateString, jstDateStringToUtcIso } from "@/utils/date";
+import TodoDifficultyRadioButton from "@/components/todoDifficulityRadioButton";
+import {
+  DEFAULT_TODO_DIFFICULTY,
+  getAffectionDeltaForMode,
+  getModeAdjustedValue,
+  getTodoReward,
+  TodoDifficultyLevel,
+} from "@/constants/todoRewards";
+import { useAppMode } from "@/components/appModeProvider";
+import { applyCoinChange } from "@/lib/coins/applyCoinChange";
 
 type CreateProps = { userId: string };
 export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
@@ -36,8 +46,12 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<string>(todayJst);
+  const [difficulty, setDifficulty] = useState<TodoDifficultyLevel>(
+    DEFAULT_TODO_DIFFICULTY
+  );
   const [loading, setLoading] = useState(false);
   const { affection, setHeraStatus } = useHera();
+  const { mode } = useAppMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,29 +65,55 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
     // JST の YYYY-MM-DD を UTC ISO に変換
     const deadlineIso = jstDateStringToUtcIso(date);
 
-    const { error } = await supabase.from("todo").insert({
-      user_id: userId,
-      title,
-      description: description || null,
-      deadline: deadlineIso,
-      completed: false,
-    });
+    const { data: newTodo, error } = await supabase
+      .from("todo")
+      .insert({
+        user_id: userId,
+        title,
+        description: description || null,
+        deadline: deadlineIso,
+        completed: false,
+        difficulty,
+      })
+      .select("id, difficulty")
+      .single();
     if (error) {
       toast.error("タスク作成に失敗");
     } else {
-      const delta = 1;
-      await updateAffection(userId, delta);
-      const message = getActionMessage("create" as HeraAction, affection);
-      const newAffection = Math.min(100, Math.max(0, affection + delta));
+      const reward = getTodoReward(difficulty, "create");
+      const affectionDelta = getAffectionDeltaForMode(reward.affection, mode);
+      const coinDelta = getModeAdjustedValue(reward.coins, mode);
+
+      await updateAffection(userId, affectionDelta);
+      const newAffection = Math.min(
+        100,
+        Math.max(0, affection + affectionDelta)
+      );
+      const message = getActionMessage("create" as HeraAction, newAffection);
       setHeraStatus({
         affection: newAffection,
-        delta: delta,
+        delta: affectionDelta,
         message: message,
       });
+
+      try {
+        await applyCoinChange({
+          supabase,
+          userId,
+          amount: coinDelta,
+          type: "todo_reward",
+          todoId: newTodo?.id,
+          notificationContent: `Todo作成でヘラコインを${coinDelta}枚獲得しました`,
+        });
+      } catch (coinError) {
+        console.error("コインの更新に失敗", coinError);
+        toast.error("コインの更新に失敗しました");
+      }
       setOpen(false);
       setTitle("");
       setDescription("");
       setDate(todayJst);
+      setDifficulty(DEFAULT_TODO_DIFFICULTY);
       router.refresh();
     }
     setLoading(false);
@@ -100,9 +140,6 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
           <DialogTitle>新しいタスクを作成</DialogTitle>
-          <DialogDescription>
-            タイトルと締切日を入力してください。
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div>
@@ -133,6 +170,11 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
               required
             />
           </div>
+          <TodoDifficultyRadioButton
+            value={difficulty}
+            onChange={setDifficulty}
+            disabled={loading}
+          />
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="ghost" disabled={loading}>
@@ -145,6 +187,6 @@ export const CreateTodoDialog: React.FC<CreateProps> = ({ userId }) => {
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 };
