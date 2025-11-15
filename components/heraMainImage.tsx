@@ -1,42 +1,32 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import type { HeraMood } from "@/lib/state";
-import { useHera } from "@/lib/hera/context";
-
-const moodToImage: Record<HeraMood, { src: string; alt: string }> = {
-  最高: {
-    src: "/hera-chan/main/excellent.png",
-    alt: "最高のヘラちゃん",
-  },
-  良い: {
-    src: "/hera-chan/main/good.png",
-    alt: "良いヘラちゃん",
-  },
-  普通: {
-    src: "/hera-chan/main/neutral.png",
-    alt: "普通のヘラちゃん",
-  },
-  悪い: { src: "/hera-chan/main/bad.png", alt: "悪いヘラちゃん" },
-  非常に悪い: {
-    src: "/hera-chan/main/very-bad.png",
-    alt: "とても悪いヘラちゃん",
-  },
-};
+import { useHera, useProfile } from "@/lib/hera/context";
 
 /**
  * 好感度からムードを判定し、対応するヘラちゃん画像を表示するコンポーネント
  */
 export default function HeraMainImage() {
-  const { mood } = useHera();
+  const { appearance, moodKey } = useHera();
+  const baseUrl = "/hera-chan/main/layer";
+
+  const backHairSrc = `${baseUrl}/back-hair/${appearance.backHairKey || "default"}.png`;
+  const clothesSrc = `${baseUrl}/clothes/${appearance.clothesKey || "default"}.png`;
+  const frontHairShadow = `${baseUrl}/front-hair-shadow/${appearance.frontHairKey || "default"}.png`;
+  const pale = moodKey === "very-bad" ? `${baseUrl}/pale/pale-on.png` : null;
+  const frontHairSrc = `${baseUrl}/front-hair/${appearance.frontHairKey || "default"}.png`;
+  const expressionSrc = `${baseUrl}/expression/${moodKey || "neutral"}.png`;
+
   const overlayImages = [
-    { src: "/variations/1.png", alt: "ヘラちゃんのオーバーレイ" },
-    { src: "/variations/2.png", alt: "ヘラちゃんのオーバーレイ" },
-    { src: "/variations/3.png", alt: "ヘラちゃんのオーバーレイ" },
-    { src: "/variations/4.png", alt: "ヘラちゃんのオーバーレイ" },
-    { src: "/variations/5.png", alt: "ヘラちゃんのオーバーレイ" },
-    { src: "/variations/6.png", alt: "ヘラちゃんのオーバーレイ" },
+    { src: backHairSrc, alt: "後ろ髪" },
+    { src: clothesSrc, alt: "服" },
+    { src: frontHairShadow, alt: "前髪の影" },
+    ...(pale ? [{ src: pale, alt: "青白さ" }] : []),
+    { src: frontHairSrc, alt: "前髪" },
+    { src: expressionSrc, alt: "表情" },
   ];
+
+  // const frontHairSrc = profile.frontHairItemId ? `${baseUrl}front_hair_${}.png`;
 
   const [loadedFlags, setLoadedFlags] = useState<Record<number, boolean>>({});
   const handleImageLoad = (index: number) => {
@@ -67,7 +57,7 @@ export default function HeraMainImage() {
           loading="eager"
           sizes="(max-width: 1024px) 70vw, 550px"
           className={`object-contain transition-opacity duration-300 ${loadedFlags[index] ? "opacity-100" : "opacity-0"}`}
-          onLoadingComplete={() => handleImageLoad(index)}
+          onLoad={() => handleImageLoad(index)}
         />
       ))}
     </div>
