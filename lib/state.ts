@@ -1,5 +1,6 @@
 // 型定義
 export type HeraMood = "最高" | "良い" | "普通" | "悪い" | "非常に悪い";
+export type HeraMoodKey = "excellent" | "good" | "neutral" | "bad" | "very-bad";
 
 export interface HeraState {
   affection: number;
@@ -12,8 +13,15 @@ export const getHeraMood = (affection: number): HeraMood => {
   if (affection >= 80) return "良い";
   if (affection >= 60) return "普通";
   if (affection >= 35) return "悪い";
-  if (affection > 0) return "非常に悪い";
   return "非常に悪い";
+};
+
+export const getHeraMoodKey = (affection: number): HeraMoodKey => {
+  if (affection == 100) return "excellent";
+  if (affection >= 80) return "good";
+  if (affection >= 60) return "neutral";
+  if (affection >= 35) return "bad";
+  return "very-bad";
 };
 
 // Affectionから揺れの強さを決定する

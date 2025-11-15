@@ -103,8 +103,7 @@ async function TodosContent() {
                   className={`absolute ${todo.description ? "bottom-6" : "bottom-2"}  right-4`}
                 >
                   <CompleteCheckbox
-                    id={todo.id}
-                    completed={todo.completed}
+                    todo={todo}
                     userId={userId}
                     updateAffection={updateAffection}
                   />
@@ -122,7 +121,7 @@ async function TodosContent() {
                     className={`absolute ${todo.description ? "top-4" : "top-2"} right-4`}
                   >
                     <DeleteTodoButton
-                      todoId={todo.id}
+                      todo={todo}
                       userId={userId}
                       updateAffection={updateAffection}
                     />
@@ -155,8 +154,7 @@ async function TodosContent() {
               )}
               <div className="absolute bottom-4 right-4">
                 <CompleteCheckbox
-                  id={todo.id}
-                  completed={todo.completed}
+                  todo={todo}
                   userId={userId}
                   updateAffection={updateAffection}
                 />

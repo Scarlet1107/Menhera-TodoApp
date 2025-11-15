@@ -1,5 +1,6 @@
 // lib/hera/types.ts
 import { HeraMood } from "@/lib/state";
+import type { TodoDifficultyLevel } from "@/constants/todoRewards";
 
 /**
  * ログイン状態のイベント種別
@@ -26,4 +27,6 @@ export type Todo = {
   description?: string;
   deadline: string;
   completed: boolean;
+  difficulty: TodoDifficultyLevel;
+  reward_given: boolean;
 };

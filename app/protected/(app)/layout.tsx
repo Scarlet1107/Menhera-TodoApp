@@ -9,11 +9,11 @@ import isBetween from "dayjs/plugin/isBetween";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
-import { HeraProvider, HeraStatus } from "@/lib/hera/context";
+import { HeraProvider, HeraStatus, ProfileProvider } from "@/lib/hera/context";
 import { decideEventType } from "@/lib/hera/decideEvent";
 import { computeDelta } from "@/lib/hera/computeDelta";
 import { buildMessage } from "@/lib/hera/messages";
-import { getHeraMood } from "@/lib/state";
+import { getHeraMood, getHeraMoodKey } from "@/lib/state";
 import {
   ANNIVERSARY_PRESENT_OPTIONS,
   ONE_DAY_GAP_REPLACE_OPTIONS,
@@ -49,6 +49,30 @@ export default async function ProtectedLayout({
 
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
   const profile = await getUserProfile(userId);
+
+  // ヘラちゃんの見た目を取得
+  const idsToFetch = [profile.frontHairItemId, profile.backHairItemId, profile.clothesItemId].filter(Boolean);
+  let itemsById: Record<string, { key: string }> = {};
+  // アイテムが1つでも指定されている場合だけ DB から取得
+  if (idsToFetch.length > 0) {
+    const { data: items, error } = await supabase
+      .from("item")
+      .select("id, key")
+      .in("id", idsToFetch);
+
+    if (error) {
+      console.error("Failed to fetch items", error);
+    } else {
+      itemsById = Object.fromEntries(
+        items.map((i) => [i.id, { key: i.key }])
+      );
+    }
+  }
+  const appearance = {
+    frontHairKey: profile.frontHairItemId ? itemsById[profile.frontHairItemId]?.key ?? "default" : "default",
+    backHairKey: profile.backHairItemId ? itemsById[profile.backHairItemId]?.key ?? "default" : "default",
+    clothesKey: profile.clothesItemId ? itemsById[profile.clothesItemId]?.key ?? "default" : "default",
+  };
 
   const isDarkMode = profile.mode === "dark";
 
@@ -90,8 +114,7 @@ export default async function ProtectedLayout({
   // Todo: updateAffection関数で処理をまとめたい
   // Bad-Endに行く際に、確実にaffectionを0にしてからルーティングする必要があるので注意
   const baseDelta = computeDelta(eventType);
-  const scaledDelta =
-    isDarkMode && baseDelta < 0 ? baseDelta * 2 : baseDelta;
+  const scaledDelta = isDarkMode && baseDelta < 0 ? baseDelta * 2 : baseDelta;
   const penalty = isDarkMode ? deleteTodoPenalty * 2 : 0;
   const delta = scaledDelta - penalty;
   const newAffection = Math.max(0, Math.min(100, profile.affection + delta));
@@ -205,16 +228,20 @@ export default async function ProtectedLayout({
   const status: HeraStatus = {
     affection: newAffection,
     mood,
+    moodKey: getHeraMoodKey(newAffection),
     event: eventType,
     delta,
     message,
+    appearance: appearance
   };
 
   return (
     <>
       <DynamicBackground />
       <div className="z-10 min-w-0 w-full pt-4">
-        <HeraProvider status={status}>{children}</HeraProvider>
+        <HeraProvider status={status}>
+          <ProfileProvider initialProfile={profile}>{children}</ProfileProvider>
+        </HeraProvider>
       </div>
     </>
   );
