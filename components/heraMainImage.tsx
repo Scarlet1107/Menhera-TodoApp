@@ -26,8 +26,6 @@ export default function HeraMainImage() {
     { src: expressionSrc, alt: "表情" },
   ];
 
-  // const frontHairSrc = profile.frontHairItemId ? `${baseUrl}front_hair_${}.png`;
-
   const [loadedFlags, setLoadedFlags] = useState<Record<number, boolean>>({});
   const handleImageLoad = (index: number) => {
     setLoadedFlags(prev => {
@@ -39,7 +37,8 @@ export default function HeraMainImage() {
   return (
     <div
       className="
-    relative left-1/2 bottom-0 transform -translate-x-2/3
+    fixed bottom-0 left-1/3 -translate-x-1/2
+    z-0 pointer-events-none select-none
     w-[400px] h-[500px]
     sm:w-[420px] sm:h-[520px]
     md:w-[450px] md:h-[550px]
