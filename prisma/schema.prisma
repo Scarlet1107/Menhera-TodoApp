@@ -49,6 +49,12 @@ enum CoinLogType {
   manual_adjust // 運営用の手動調整など
 }
 
+enum NotificationType {
+  coin_reward // コイン獲得
+  item_acquired // アイテム入手
+  system // 運営・システムからのお知らせ
+}
+
 // =======================
 // Models
 // =======================
@@ -76,9 +82,10 @@ model Profile {
   backHair  Item? @relation("BackHairItem", fields: [backHairItemId], references: [id])
   clothes   Item? @relation("ClothesItem", fields: [clothesItemId], references: [id])
 
-  todos     Todo[]
-  inventory UserItem[]
-  coinLogs  CoinLog[]
+  todos         Todo[]
+  inventory     UserItem[]
+  coinLogs      CoinLog[]
+  notifications Notification[]
 
   @@map("profile")
 }
@@ -177,4 +184,20 @@ model CoinLog {
   @@index([todoId])
   @@index([itemId])
   @@map("coin_log")
+}
+
+model Notification {
+  id     String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  type    NotificationType
+  content String
+
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  profile Profile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
 }
