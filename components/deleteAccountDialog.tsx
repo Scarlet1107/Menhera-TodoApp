@@ -50,7 +50,7 @@ export default function BadEndClient({ userId }: Props) {
                 ずっと待ってたのに…来ないなら、私…消えちゃうから…
               </p>
               <Image
-                src="/hera-chan/special/bad-end.png"
+                src="/hera-chan/main/bad-end.png"
                 width={200}
                 height={200}
                 alt="バッドエンドへらちゃん"
