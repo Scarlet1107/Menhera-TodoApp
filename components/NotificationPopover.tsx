@@ -70,7 +70,7 @@ export const NotificationPopover = () => {
       <PopoverContent className="mr-2 w-64 rounded-2xl p-0">
         <Card className="border-pink-200">
           <CardHeader>
-            <CardTitle className="text-gray-800">通知</CardTitle>
+            <CardTitle className="text-gray-800 dark:text-gray-200">通知</CardTitle>
           </CardHeader>
           <Separator className="bg-pink-200 -my-2" />
           <CardContent className="p-0">
