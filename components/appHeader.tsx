@@ -2,42 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { JwtPayload } from "@supabase/supabase-js";
-import {
-  Home,
-  Settings,
-  ShoppingBag,
-  ListTodo,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { NotificationPopover } from "./NotificationPopover";
+import { MobileNavigation } from "./mobileNavigation";
+import { sharedTabs, type Tab } from "@/constants/navigationTabs";
+import {
+  buildSizeStyle,
+  buildWidthStyle,
+  type SizeConfig,
+  type SizeValue,
+} from "./navigationSizing";
 
+interface AppHeaderProps {
+  tabs?: Tab[];
+  navWidth?: SizeValue;
+  iconSize?: SizeConfig;
+  mobileNavWidth?: SizeValue;
+  mobileTabSize?: SizeConfig;
+  mobileIconSize?: SizeConfig;
+}
 
-export default function AppHeader() {
-  const tabs = [
-    {
-      href: "/protected/home",
-      icon: <Home className="w-4 h-4" />,
-      label: "ホーム",
-    },
-    {
-      href: "/protected/todos",
-      icon: <ListTodo className="w-4 h-4" />,
-      label: "Todos",
-    },
-    {
-      href: "/protected/shop",
-      icon: <ShoppingBag className="w-4 h-4" />,
-      label: "ショップ",
-    },
-    {
-      href: "/protected/settings",
-      icon: <Settings className="w-4 h-4" />,
-      label: "設定",
-    },
-  ];
+export default function AppHeader({
+  tabs = sharedTabs,
+  navWidth,
+  iconSize = { width: 16, height: 16 },
+  mobileNavWidth,
+  mobileTabSize,
+  mobileIconSize,
+}: AppHeaderProps) {
   const pathname = usePathname();
+  const navStyle = buildWidthStyle(navWidth);
+  const iconStyle = buildSizeStyle(iconSize);
 
   return (
     <header className="w-full border-b bg-pink-50/80 dark:bg-stone-700/80 border-pink-200 dark:border-stone-900 px-4 shadow-sm h-14 flex items-center justify-between sm:py-8">
@@ -50,8 +46,8 @@ export default function AppHeader() {
         />
       </Link>
 
-      <nav className="hidden sm:flex gap-4 ml-auto pl-8">
-        {tabs.map(({ href, icon, label }) => {
+      <nav className="hidden sm:flex gap-4 ml-auto pl-8" style={navStyle}>
+        {tabs.map(({ href, icon: Icon, label }) => {
           const isActive =
             pathname === href || pathname.startsWith(href + "/");
 
@@ -66,12 +62,18 @@ export default function AppHeader() {
                   : "dark:text-white text-gray-600 hover:dark:bg-white hover:dark:text-pink-500"
               )}
             >
-              {icon}
+              <Icon className="shrink-0" style={iconStyle} />
               <span>{label}</span>
             </Link>
           );
         })}
       </nav>
+      <MobileNavigation
+        tabs={tabs}
+        navWidth={mobileNavWidth}
+        itemSize={mobileTabSize}
+        iconSize={mobileIconSize}
+      />
       <NotificationPopover />
     </header>
   );

@@ -90,7 +90,6 @@ export default async function RootLayout({
           <main className="min-h-screen flex flex-col items-center">
             {children}
           </main>
-          {user && <MobileNavigation />}
           <Toaster />
         </AppModeProvider>
       </body>
