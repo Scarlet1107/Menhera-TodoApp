@@ -67,7 +67,7 @@ export const NotificationPopover = () => {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="mr-2 w-64 rounded-2xl p-0">
+      <PopoverContent className="w-48 md:w-60 lg:w-80 rounded-2xl p-0">
         <Card className="border-pink-200">
           <CardHeader>
             <CardTitle className="text-gray-800 dark:text-gray-200">通知</CardTitle>
