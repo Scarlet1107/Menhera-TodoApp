@@ -1,4 +1,4 @@
-import HeaderAuth from "@/components/header-auth";
+import HeaderAuth from "@/components/appHeader";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { MobileNavigation } from "@/components/mobileNavigation";
@@ -88,9 +88,6 @@ export default async function RootLayout({
       <body className="bg-background text-foreground">
         <AppModeProvider initialMode={initialMode} userId={userId}>
           <main className="min-h-screen flex flex-col items-center">
-            <div className="relative z-50 w-full h-14 shadow-sm flex items-center justify-end">
-              <HeaderAuth user={user} />
-            </div>
             {children}
           </main>
           {user && <MobileNavigation />}

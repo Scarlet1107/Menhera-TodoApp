@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import { useAppMode } from "@/components/appModeProvider";
 import type { Todo } from "@/lib/hera/types";
 import {
@@ -78,7 +78,7 @@ export const DeleteTodoButton: React.FC<DeleteTodoProps> = ({
           userId,
           amount: coinDelta,
           type: "todo_reward",
-          todoId: todo.id,
+          todoId: undefined, // Todoが削除されているためnullを渡す
           notificationContent:
             coinDelta >= 0
               ? `Todo削除でヘラコインを${coinDelta}枚獲得しました`

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { getHeraMood, getShakeIntensity, HeraMood } from "@/lib/state";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 
 interface HeraMessageProps {
   delay?: number;

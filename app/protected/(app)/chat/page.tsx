@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import HeraIconImage from "@/components/heraIconImage";
 
 type Message = { role: "user" | "assistant"; content: string };

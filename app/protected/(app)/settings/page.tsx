@@ -15,35 +15,37 @@ import { DarkModeToggle } from "@/components/darkModeToggle";
 
 const SettingsPage = () => {
   return (
-    <div className="p-4 max-w-md mx-auto space-y-6 mb-20">
-      <Card>
-        <CardHeader>
-          <CardTitle>アカウント情報</CardTitle>
-        </CardHeader>
-        <Suspense fallback={<AccountInfoSkeleton />}>
-          <AccountInfo />
-        </Suspense>
-      </Card>
+    <div className="p-4 max-w-md mx-auto mb-24 md:mb-0">
+      <div className="flex flex-col space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>アカウント情報</CardTitle>
+          </CardHeader>
+          <Suspense fallback={<AccountInfoSkeleton />}>
+            <AccountInfo />
+          </Suspense>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>アクション</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col space-y-4">
-          {/* ログアウト確認ダイアログ */}
-          <LogoutDialog />
+        <Card>
+          <CardHeader>
+            <CardTitle>アクション</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col space-y-4">
+            {/* ログアウト確認ダイアログ */}
+            <LogoutDialog />
 
-          {/* パスワードリセット */}
-          <Link href="/protected/reset-password" className="w-full">
-            <Button
-              variant="outline"
-              className="w-full flex items-center justify-center"
-            >
-              <Key className="mr-2" /> パスワードをリセット
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+            {/* パスワードリセット */}
+            <Link href="/protected/reset-password" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center"
+              >
+                <Key className="mr-2" /> パスワードをリセット
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
@@ -76,9 +78,18 @@ function AccountInfoSkeleton() {
   return (
     <CardContent className="space-y-4">
       <div className="space-y-2">
-        <Label>ユーザー名</Label>
+        <div className="space-y-2">
+          <Label>ユーザー名</Label>
+          <Skeleton className="h-10 w-full rounded-md" />
+        </div>
         <Skeleton className="h-10 w-full rounded-md" />
-        <Skeleton className="h-10 w-full rounded-md" />
+      </div>
+      <div className="w-full flex items-center justify-between rounded-md border px-3 py-2">
+        <div className="flex-1">
+          <Skeleton className="h-4 w-20 mb-1" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+        <Skeleton className="h-6 w-11 rounded-full" />
       </div>
       <div className="space-y-1">
         <Label>最終ログイン</Label>

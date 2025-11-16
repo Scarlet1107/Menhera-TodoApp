@@ -16,7 +16,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { updateAffection } from "../app/protected/(app)/todos/actions";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 

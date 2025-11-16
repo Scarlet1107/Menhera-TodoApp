@@ -1,3 +1,4 @@
+import LPHeader from "@/components/lpHeader";
 import { getUserClaims } from "@/utils/supabase/getUserClaims";
 import { redirect } from "next/navigation";
 
@@ -21,6 +22,9 @@ export default async function Layout({
   }
 
   return (
-    <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
+    <>
+      <LPHeader />
+      <div className="max-w-7xl flex flex-col gap-12 items-start">{children}</div>
+    </>
   );
 }

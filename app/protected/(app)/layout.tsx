@@ -9,7 +9,8 @@ import isBetween from "dayjs/plugin/isBetween";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/utils/supabase/server";
-import { HeraProvider, HeraStatus, ProfileProvider } from "@/lib/hera/context";
+import { HeraProvider, HeraStatus } from "@/lib/context/hera";
+import { ProfileProvider } from "@/lib/context/profile";
 import { decideEventType } from "@/lib/hera/decideEvent";
 import { computeDelta } from "@/lib/hera/computeDelta";
 import { buildMessage } from "@/lib/hera/messages";
@@ -21,6 +22,8 @@ import {
 import DynamicBackground from "@/components/dynamicBackground";
 import { getUserClaims } from "@/utils/supabase/getUserClaims";
 import { getUserProfile } from "@/utils/supabase/getUserProfile";
+import { NotificationProvider } from "@/lib/context/notification";
+import AppHeader from "@/components/appHeader";
 
 const getRandomItem = <T,>(items: T[]): T => {
   if (!items.length) {
@@ -50,8 +53,32 @@ export default async function ProtectedLayout({
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
   const profile = await getUserProfile(userId);
 
+  const { data: rowNotifications, error: notifError } = await supabase
+    .from("notifications")
+    .select("id,user_id,type,content,is_read,created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (notifError || !rowNotifications) {
+    console.error("Failed to fetch notifications", notifError);
+  }
+
+  // ここで rowNotifications はもう null じゃないので
+  const notifications = rowNotifications?.map((notification) => ({
+    id: notification.id,
+    userId: notification.user_id,
+    type: notification.type,
+    content: notification.content,
+    isRead: notification.is_read,
+    createdAt: new Date(notification.created_at),
+  }));
+
   // ヘラちゃんの見た目を取得
-  const idsToFetch = [profile.frontHairItemId, profile.backHairItemId, profile.clothesItemId].filter(Boolean);
+  const idsToFetch = [
+    profile.frontHairItemId,
+    profile.backHairItemId,
+    profile.clothesItemId,
+  ].filter(Boolean);
   let itemsById: Record<string, { key: string }> = {};
   // アイテムが1つでも指定されている場合だけ DB から取得
   if (idsToFetch.length > 0) {
@@ -63,15 +90,19 @@ export default async function ProtectedLayout({
     if (error) {
       console.error("Failed to fetch items", error);
     } else {
-      itemsById = Object.fromEntries(
-        items.map((i) => [i.id, { key: i.key }])
-      );
+      itemsById = Object.fromEntries(items.map((i) => [i.id, { key: i.key }]));
     }
   }
   const appearance = {
-    frontHairKey: profile.frontHairItemId ? itemsById[profile.frontHairItemId]?.key ?? "default" : "default",
-    backHairKey: profile.backHairItemId ? itemsById[profile.backHairItemId]?.key ?? "default" : "default",
-    clothesKey: profile.clothesItemId ? itemsById[profile.clothesItemId]?.key ?? "default" : "default",
+    frontHairKey: profile.frontHairItemId
+      ? (itemsById[profile.frontHairItemId]?.key ?? "default")
+      : "default",
+    backHairKey: profile.backHairItemId
+      ? (itemsById[profile.backHairItemId]?.key ?? "default")
+      : "default",
+    clothesKey: profile.clothesItemId
+      ? (itemsById[profile.clothesItemId]?.key ?? "default")
+      : "default",
   };
 
   const isDarkMode = profile.mode === "dark";
@@ -232,17 +263,20 @@ export default async function ProtectedLayout({
     event: eventType,
     delta,
     message,
-    appearance: appearance
+    appearance: appearance,
   };
 
   return (
     <>
       <DynamicBackground />
-      <div className="z-10 min-w-0 w-full pt-4">
-        <HeraProvider status={status}>
-          <ProfileProvider initialProfile={profile}>{children}</ProfileProvider>
-        </HeraProvider>
-      </div>
+      <HeraProvider status={status}>
+        <ProfileProvider initialProfile={profile}>
+          <NotificationProvider initialNotifications={notifications || []}>
+            <AppHeader />
+            {children}
+          </NotificationProvider>
+        </ProfileProvider>
+      </HeraProvider>
     </>
   );
 }

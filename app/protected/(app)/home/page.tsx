@@ -10,7 +10,7 @@ const HomePage = async () => {
   return (
     <div className="relative w-full h-full flex-1">
       {/* ヘラちゃんのメッセージ部分 */}
-      <div className="mx-4">
+      <div className="mx-4 mt-6 lg:mt-8">
         <HeraMessage />
       </div>
       <div className="fixed right-4 bottom-40 md:bottom-56 md:right-20">

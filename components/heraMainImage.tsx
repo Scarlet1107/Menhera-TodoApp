@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import { Loader } from "lucide-react";
 import Loading from "@/app/protected/(app)/loading";
 import { Skeleton } from "./ui/skeleton";
@@ -38,7 +38,6 @@ export default function HeraMainImage() {
     });
   };
   useEffect(() => {
-    console.log("Loaded flags:", Object.keys(loadedFlags).length);
     if (Object.keys(loadedFlags).length === overlayImages.length) {
       setIsReady(true);
     }

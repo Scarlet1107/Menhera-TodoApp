@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import type { HeraMood } from "@/lib/state";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 
 // アイコン用のムード→画像マッピング
 const moodToIcon: Record<HeraMood, { src: string; alt: string }> = {

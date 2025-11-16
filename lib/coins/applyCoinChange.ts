@@ -41,7 +41,7 @@ export const applyCoinChange = async ({
   if (profileError) throw profileError;
 
   const currentBalance = profileData?.menhera_coin ?? 0;
-  const nextBalance = currentBalance + amount;
+  const nextBalance = Math.max(0, currentBalance + amount);
 
   const { error: updateError } = await supabase
     .from("profile")
