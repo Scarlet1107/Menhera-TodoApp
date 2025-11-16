@@ -51,13 +51,15 @@ export default async function ProtectedLayout({
   const { userId } = await getUserClaims();
 
   const today = dayjs().tz("Asia/Tokyo").startOf("day");
-  const profile = await getUserProfile(userId);
 
-  const { data: rowNotifications, error: notifError } = await supabase
+  const notificationsQuery = supabase
     .from("notifications")
     .select("id,user_id,type,content,is_read,created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
+
+  const [profile, { data: rowNotifications, error: notifError }] =
+    await Promise.all([getUserProfile(userId), notificationsQuery]);
 
   if (notifError || !rowNotifications) {
     console.error("Failed to fetch notifications", notifError);
@@ -79,31 +81,13 @@ export default async function ProtectedLayout({
     profile.backHairItemId,
     profile.clothesItemId,
   ].filter(Boolean);
-  let itemsById: Record<string, { key: string }> = {};
-  // アイテムが1つでも指定されている場合だけ DB から取得
-  if (idsToFetch.length > 0) {
-    const { data: items, error } = await supabase
-      .from("item")
-      .select("id, key")
-      .in("id", idsToFetch);
-
-    if (error) {
-      console.error("Failed to fetch items", error);
-    } else {
-      itemsById = Object.fromEntries(items.map((i) => [i.id, { key: i.key }]));
-    }
-  }
-  const appearance = {
-    frontHairKey: profile.frontHairItemId
-      ? (itemsById[profile.frontHairItemId]?.key ?? "default")
-      : "default",
-    backHairKey: profile.backHairItemId
-      ? (itemsById[profile.backHairItemId]?.key ?? "default")
-      : "default",
-    clothesKey: profile.clothesItemId
-      ? (itemsById[profile.clothesItemId]?.key ?? "default")
-      : "default",
-  };
+  const itemsPromise =
+    idsToFetch.length > 0
+      ? supabase.from("item").select("id, key").in("id", idsToFetch)
+      : Promise.resolve({ data: [], error: null } as {
+        data: { id: string; key: string }[] | null;
+        error: unknown;
+      });
 
   const isDarkMode = profile.mode === "dark";
 
@@ -255,6 +239,28 @@ export default async function ProtectedLayout({
   if (annivText) message += `\n${annivText}`;
   if (todoActionText) message += `\n${todoActionText}`;
   if (deleteTodoPenaltyText) message += `\n${deleteTodoPenaltyText}`;
+
+  const { data: items, error: itemsError } = await itemsPromise;
+  if (itemsError) {
+    console.error("Failed to fetch items", itemsError);
+  }
+  const itemsById =
+    items?.reduce<Record<string, { key: string }>>((acc, item) => {
+      acc[item.id] = { key: item.key };
+      return acc;
+    }, {}) ?? {};
+
+  const appearance = {
+    frontHairKey: profile.frontHairItemId
+      ? (itemsById[profile.frontHairItemId]?.key ?? "default")
+      : "default",
+    backHairKey: profile.backHairItemId
+      ? (itemsById[profile.backHairItemId]?.key ?? "default")
+      : "default",
+    clothesKey: profile.clothesItemId
+      ? (itemsById[profile.clothesItemId]?.key ?? "default")
+      : "default",
+  };
 
   const status: HeraStatus = {
     affection: newAffection,
