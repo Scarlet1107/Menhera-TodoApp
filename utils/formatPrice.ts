@@ -8,5 +8,5 @@
  */
 export function formatPrice(amount: number): string {
   // toLocaleString で3桁区切りにし、末尾に "円" を付与
-  return `${amount.toLocaleString("ja-JP")}円`;
+  return `${amount.toLocaleString("ja-JP")}`;
 }

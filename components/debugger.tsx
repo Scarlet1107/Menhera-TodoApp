@@ -1,5 +1,5 @@
 "use client";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import React from "react";
 // Display Heras status and debug information
 const Debugger = () => {

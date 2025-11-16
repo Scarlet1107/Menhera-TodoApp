@@ -5,6 +5,7 @@ import { Card, CardTitle } from "@/components/ui/card";
 import PurchaseDialog from "@/components/PurchaseDialog";
 import { formatPrice } from "@/utils/formatPrice";
 import { getUserClaims } from "@/utils/supabase/getUserClaims";
+import { getUserProfile } from "@/utils/supabase/getUserProfile";
 
 export const dynamic = "force-dynamic";
 
@@ -50,10 +51,28 @@ const shopItems = [
 
 export default async function Page() {
   const { userId } = await getUserClaims();
+  const profile = await getUserProfile(userId);
+  const menheraCoin = profile.menheraCoin;
 
   return (
     <div className="p-4 max-w-md mx-auto mb-24 md:mb-0">
       <div className="flex flex-col space-y-4">
+        <Card className="p-4 mb-4">
+          <div className="flex items-center">
+            <div className="flex items-center space-x-3">
+              <CardTitle className="text-lg">所持メンヘラコイン：</CardTitle>
+            </div>
+            <div className="text-xl font-bold flex justify-center items-center space-x-2">
+              {formatPrice(menheraCoin)}
+              <Image
+                src="/shop/hera-coin.png"
+                alt="メンヘラコイン"
+                width={28}
+                height={28}
+              />
+            </div>
+          </div>
+        </Card>
         {shopItems.map((item) => (
           <Card key={item.id} className="flex flex-row justify-between p-4">
             <div className="flex space-x-2">

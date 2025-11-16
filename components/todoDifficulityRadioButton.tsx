@@ -40,7 +40,7 @@ export default function TodoDifficultyRadioButton({
   return (
     <fieldset className="space-y-2">
       <legend className="text-sm leading-none font-medium text-foreground">
-        Todoの難易度
+        難易度
       </legend>
       <RadioGroup
         className="flex gap-0 rounded-md shadow-xs"

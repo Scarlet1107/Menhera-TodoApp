@@ -21,7 +21,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Todo } from "@/lib/hera/types";
 import { UpdateAffectionFn } from "@/app/protected/(app)/todos/actions";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import { getActionMessage, HeraAction } from "@/lib/hera/actionMessage";
 import { toJstDateString, jstDateStringToUtcIso } from "@/utils/date";
 import { useAppMode } from "@/components/appModeProvider";

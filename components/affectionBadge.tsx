@@ -1,5 +1,5 @@
 "use client";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 

@@ -1,7 +1,10 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
-import { useHera, useProfile } from "@/lib/hera/context";
+import { useEffect, useState } from "react";
+import { useHera } from "@/lib/context/hera";
+import { Loader } from "lucide-react";
+import Loading from "@/app/protected/(app)/loading";
+import { Skeleton } from "./ui/skeleton";
 
 /**
  * 好感度からムードを判定し、対応するヘラちゃん画像を表示するコンポーネント
@@ -27,12 +30,19 @@ export default function HeraMainImage() {
   ];
 
   const [loadedFlags, setLoadedFlags] = useState<Record<number, boolean>>({});
+  const [isReady, setIsReady] = useState(false);
   const handleImageLoad = (index: number) => {
     setLoadedFlags(prev => {
       if (prev[index]) return prev;
       return { ...prev, [index]: true };
     });
   };
+  useEffect(() => {
+    if (Object.keys(loadedFlags).length === overlayImages.length) {
+      setIsReady(true);
+    }
+  }, [loadedFlags, overlayImages.length]);
+
 
   return (
     <div
@@ -47,6 +57,16 @@ export default function HeraMainImage() {
     2xl:w-[650px] 2xl:h-[700px]
   "
     >
+      {!isReady && (
+        // 後々ヘラちゃんの立ち絵に差し替え予定?
+        <Image
+          src="/loading/hera.svg"
+          width={300}
+          height={300}
+          alt="object-contain transition-opacity duration-300"
+        />
+      )}
+
       {overlayImages.map((image, index) => (
         <Image
           key={index}
@@ -55,7 +75,7 @@ export default function HeraMainImage() {
           fill
           loading="eager"
           sizes="(max-width: 1024px) 70vw, 550px"
-          className={`object-contain transition-opacity duration-300 ${loadedFlags[index] ? "opacity-100" : "opacity-0"}`}
+          className={`object-contain transition-opacity duration-300 ${isReady ? "opacity-100" : "opacity-0"}`}
           onLoad={() => handleImageLoad(index)}
         />
       ))}

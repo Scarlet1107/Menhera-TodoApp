@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRouter } from "next/navigation";
-import { useHera } from "@/lib/hera/context";
+import { useHera } from "@/lib/context/hera";
 import { getActionMessage } from "@/lib/hera/actionMessage";
 import { useAppMode } from "@/components/appModeProvider";
 import type { Todo } from "@/lib/hera/types";

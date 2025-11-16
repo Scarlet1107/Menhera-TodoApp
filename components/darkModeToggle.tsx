@@ -58,10 +58,10 @@ export function DarkModeToggle() {
         >
           <div>
             <p className="text-sm font-semibold">ダークモード</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground whitespace-pre-line">
               {isDark
                 ? "有効中"
-                : "ノーマルモードでプレイ中。ダークモードにすると高難易度になります。"}
+                : "ノーマルモードでプレイ中"}
             </p>
           </div>
           <Switch checked={isDark} className="pointer-events-none" />
