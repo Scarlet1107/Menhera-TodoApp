@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useHera } from "@/lib/context/hera";
 
 /**
@@ -27,18 +27,13 @@ export default function HeraMainImage() {
   ];
 
   const [loadedFlags, setLoadedFlags] = useState<Record<number, boolean>>({});
-  const [isReady, setIsReady] = useState(false);
   const handleImageLoad = (index: number) => {
     setLoadedFlags(prev => {
       if (prev[index]) return prev;
       return { ...prev, [index]: true };
     });
   };
-  useEffect(() => {
-    if (Object.keys(loadedFlags).length === overlayImages.length) {
-      setIsReady(true);
-    }
-  }, [loadedFlags, overlayImages.length]);
+  const isReady = Object.keys(loadedFlags).length >= overlayImages.length;
 
 
   return (

@@ -1,6 +1,6 @@
 // File: app/protected/bad-end/page.tsx
 import { redirect } from "next/navigation";
-import BadEndClient from "../../../components/deleteAccountDialog";
+import BadEndClient from "../../../components/badEndDialog";
 import { createClient } from "@/utils/supabase/server";
 import { getUserClaims } from "@/utils/supabase/getUserClaims";
 

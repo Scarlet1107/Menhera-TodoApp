@@ -46,6 +46,7 @@ enum CoinLogType {
   todo_reward // Todo完了報酬
   anniversary // 記念日ボーナス
   gacha // ガチャでのコイン消費
+  shop_purchase // ショップでの購入
   manual_adjust // 運営用の手動調整など
 }
 
@@ -68,7 +69,7 @@ model Profile {
   lastActive DateTime? @map("last_active") @db.Timestamptz(6)
 
   // メンヘラコイン残高（キャッシュ）
-  menheraCoin Int @default(0) @map("menhera_coin")
+  menheraCoin Int @default(100) @map("menhera_coin")
 
   mode      Mode     @default(normal)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
@@ -117,9 +118,10 @@ model Todo {
 model Item {
   id String @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
 
-  key         String // 画像のファイル名になる想定
-  name        String
-  description String?
+  imageFilename        String  @map("image_filename") // 立ち絵の画像ファイル名 (public/hera-chan/main/ )
+  previewImageFilename String? @map("preview_image_filename") // ショップやガチャ結果に使うプレビュー画像ファイル名 (public/shop/ )
+  name                 String
+  description          String?
 
   category ItemCategory
   slot     ItemSlot     @default(none)
@@ -133,6 +135,9 @@ model Item {
   // 1ユーザー1個までのコスメか
   isUnique Boolean @default(false) @map("is_unique")
 
+  // ショップ価格（nullのとき販売不可）
+  price Int?
+
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   userItems UserItem[]
@@ -143,7 +148,7 @@ model Item {
   backHairProfiles  Profile[] @relation("BackHairItem")
   clothesProfiles   Profile[] @relation("ClothesItem")
 
-  @@unique([slot, key])
+  @@unique([slot, imageFilename])
   @@map("item")
 }
 

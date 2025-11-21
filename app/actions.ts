@@ -49,6 +49,28 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
+  // Profileテーブルにユーザープロフィールを作成
+  const userId = data.user.id;
+  const { error: profileError } = await supabase
+    .from("profile")
+    .insert({
+      user_id: userId,
+      name: name,
+    });
+
+  if (profileError) {
+    console.error(
+      "failed to create user profile for user",
+      userId,
+      profileError.message
+    );
+    return encodedRedirect(
+      "error",
+      "/sign-up",
+      "アカウントを正しく作成できませんでした。開発者にお問い合わせください。エラーコード: ProfileCreateFailed"
+    );
+  }
+
   return encodedRedirect(
     "success",
     "/sign-up",
