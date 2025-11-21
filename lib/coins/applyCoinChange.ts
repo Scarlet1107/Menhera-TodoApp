@@ -4,6 +4,7 @@ export type CoinLogType =
   | "todo_reward"
   | "anniversary"
   | "gacha"
+  | "shop_purchase"
   | "manual_adjust";
 
 export type NotificationKind = "coin_reward" | "item_acquired" | "system";
@@ -16,6 +17,7 @@ type ApplyCoinChangeParams = {
   todoId?: string;
   itemId?: string;
   notificationContent?: string;
+  skipNotification?: boolean;
 };
 
 /**
@@ -29,6 +31,7 @@ export const applyCoinChange = async ({
   todoId,
   itemId,
   notificationContent,
+  skipNotification = false,
 }: ApplyCoinChangeParams) => {
   if (amount === 0) return;
 
@@ -60,21 +63,23 @@ export const applyCoinChange = async ({
 
   if (logError) throw logError;
 
-  const defaultContent =
-    amount >= 0
-      ? `ヘラコインを${amount}枚獲得しました`
-      : `ヘラコインを${Math.abs(amount)}枚失いました`;
+  if (!skipNotification) {
+    const defaultContent =
+      amount >= 0
+        ? `ヘラコインを${amount}枚獲得しました`
+        : `ヘラコインを${Math.abs(amount)}枚失いました`;
 
-  const notificationType: NotificationKind = "coin_reward";
-  const { error: notificationError } = await supabase
-    .from("notifications")
-    .insert({
-      user_id: userId,
-      type: notificationType,
-      content: notificationContent ?? defaultContent,
-    });
+    const notificationType: NotificationKind = "coin_reward";
+    const { error: notificationError } = await supabase
+      .from("notifications")
+      .insert({
+        user_id: userId,
+        type: notificationType,
+        content: notificationContent ?? defaultContent,
+      });
 
-  if (notificationError) throw notificationError;
+    if (notificationError) throw notificationError;
+  }
 
   return nextBalance;
 };

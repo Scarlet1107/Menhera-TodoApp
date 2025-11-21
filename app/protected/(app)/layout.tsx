@@ -83,9 +83,12 @@ export default async function ProtectedLayout({
   ].filter(Boolean);
   const itemsPromise =
     idsToFetch.length > 0
-      ? supabase.from("item").select("id, key").in("id", idsToFetch)
+      ? supabase
+        .from("item")
+        .select("id,image_filename")
+        .in("id", idsToFetch)
       : Promise.resolve({ data: [], error: null } as {
-        data: { id: string; key: string }[] | null;
+        data: { id: string; image_filename: string }[] | null;
         error: unknown;
       });
 
@@ -246,7 +249,7 @@ export default async function ProtectedLayout({
   }
   const itemsById =
     items?.reduce<Record<string, { key: string }>>((acc, item) => {
-      acc[item.id] = { key: item.key };
+      acc[item.id] = { key: item.image_filename };
       return acc;
     }, {}) ?? {};
 

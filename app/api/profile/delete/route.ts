@@ -22,5 +22,7 @@ export async function DELETE() {
     return NextResponse.json({ error: deleteError.message }, { status: 500 });
   }
 
+  await authClient.auth.signOut();
+
   return NextResponse.json({ success: true });
 }

@@ -1,68 +1,92 @@
-// File: app/protected/bad-end/BadEndClient.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { redirect, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
   AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UserX } from "lucide-react";
 
-interface Props {
-  userId: string;
-}
-
-export default function BadEndClient({ userId }: Props) {
-  const [open, setOpen] = useState(true);
+export function DeleteAccountDialog() {
+  const [confirmText, setConfirmText] = useState("");
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const onDelete = async () => {
-    const resp = await fetch("/api/profile/delete/", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+  const canDelete = confirmText === "削除" && !isPending;
+
+  const handleDelete = () => {
+    if (!canDelete) return;
+    startTransition(async () => {
+      try {
+        const res = await fetch("/api/profile/delete", { method: "DELETE" });
+        console.log("delete response", res);
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          const message = body?.error ?? "削除に失敗しました";
+          toast.error(message);
+          return;
+        }
+        toast.success("アカウントを削除しました");
+        router.replace("/")
+      } catch (error) {
+        console.error("account delete failed", error);
+        toast.error("削除に失敗しました");
+      }
     });
-    const data = await resp.json();
-    if (!data.success) {
-      console.log("削除エラー", data);
-    }
-    toast("さよなら…君と過ごした時間、忘れないよ…💔");
-    router.push("/");
-    router.refresh();
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogContent onEscapeKeyDown={(e) => e.preventDefault()}>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          className="w-full flex items-center justify-center"
+        >
+          <UserX className="mr-2 h-4 w-4" />
+          退会する
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-700">
-            ……もう君はいらないの？
-          </AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="flex flex-col items-center space-y-4">
-              <p className="text-red-500">
-                ずっと待ってたのに…来ないなら、私…消えちゃうから…
-              </p>
-              <Image
-                src="/hera-chan/main/bad-end.png"
-                width={200}
-                height={200}
-                alt="バッドエンドへらちゃん"
-                className="-mb-12 -mt-4"
-              />
-            </div>
+          <AlertDialogTitle>本当に退会しますか？</AlertDialogTitle>
+          <AlertDialogDescription className="space-y-3" asChild>
+            <ul className="list-disc space-y-1 pl-6 text-sm text-start">
+              <li>プロフィール、Todo、所持アイテムなどすべてのデータが削除されます。</li>
+              <li>削除後、このアカウントは再利用できません。</li>
+              <li className="font-semibold text-destructive">この操作は取り消せず、復元できません。</li>
+            </ul>
           </AlertDialogDescription>
         </AlertDialogHeader>
+        <div className="space-y-2 py-2">
+          <Label htmlFor="confirm-delete">確認のため「削除」と入力してください</Label>
+          <Input
+            id="confirm-delete"
+            placeholder="削除"
+            value={confirmText}
+            onChange={(e) => setConfirmText(e.target.value)}
+            disabled={isPending}
+          />
+        </div>
         <AlertDialogFooter>
-          <Button variant="destructive" onClick={onDelete}>
-            アカウントを消去する
-          </Button>
+          <AlertDialogCancel disabled={isPending}>やめる</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={!canDelete}
+            className="bg-red-600 text-white hover:bg-red-700"
+          >
+            {isPending ? "削除中..." : "本当に削除する"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

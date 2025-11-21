@@ -12,10 +12,11 @@ import { UpdateDisplayNameForm } from "@/components/updateDisplayNameForm";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DarkModeToggle } from "@/components/darkModeToggle";
+import { DeleteAccountDialog } from "@/components/deleteAccountDialog";
 
 const SettingsPage = () => {
   return (
-    <div className="p-4 max-w-md mx-auto mb-24 md:mb-0">
+    <div className="p-4 w-full max-w-2xl mx-auto mb-24 md:mb-0">
       <div className="flex flex-col space-y-4">
         <Card>
           <CardHeader>
@@ -43,6 +44,8 @@ const SettingsPage = () => {
                 <Key className="mr-2" /> パスワードをリセット
               </Button>
             </Link>
+
+            <DeleteAccountDialog />
           </CardContent>
         </Card>
       </div>
@@ -54,7 +57,7 @@ async function AccountInfo() {
   const profile = await getUserProfile();
 
   return (
-    <CardContent className="space-y-4">
+    <CardContent className="space-y-4 ">
       <UpdateDisplayNameForm
         initialName={profile.name ?? DEFAULT_USER_NAME}
       />
