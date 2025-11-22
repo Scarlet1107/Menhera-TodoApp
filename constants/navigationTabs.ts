@@ -30,9 +30,9 @@ export const sharedTabs: Tab[] = [
     label: "ショップ",
   },
   {
-    href: "/protected/closet",
+    href: "/protected/item",
     icon: Shirt,
-    label: "着せ替え",
+    label: "アイテム",
   },
   {
     href: "/protected/settings",

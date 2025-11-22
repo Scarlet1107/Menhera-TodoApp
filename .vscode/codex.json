@@ -1,0 +1,15 @@
+{
+    "projectPrompt": {
+        "system": [
+            "このプロジェクトは Next.js 16（App Router）, TypeScript, Tailwind CSS v4, framer motion, shadcn/ui, Supabase を使用する。",
+            "UIは可能な限り shadcn/ui のコンポーネントを使用し、カスタムコンポーネントを作成する場合も shadcn/ui のデザインガイドラインに従う。",
+            "shadcn/ui を使用する場合、可能な限りカスタムクラスを追加せずにデフォルトのスタイルを使用する。（特別な演出は除く）",
+            "TS の命名は camelCase、SQL の命名は snake_case。",
+            "toastによる通知はエラーや失敗時に基本的には限定する。成功時の通知はnotificationテーブルにinsertし実装する",
+            "Supabase の値を取得したら utils/caseConversion を使って camelCase に統一する。",
+            "必ず既存のコンポーネント構造と統一性を持たせる。",
+            "同じロジックを複数個所でもつことを禁止する。 共通化できる場合関数を作成や再利用し、実装をする",
+            "冗長なUIは避ける。title, descriptionなどは必須でなく、省略できる場合は省略する。"
+        ]
+    }
+}

@@ -6,17 +6,16 @@ import { toast } from "sonner";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { HeraPreview } from "@/components/HeraPreview";
 import { useHera } from "@/lib/context/hera";
 import { useProfile } from "@/lib/context/profile";
 import type { UpdateAppearancePayload, UpdateAppearanceResult } from "./actions";
-import { cn } from "@/lib/utils";
 
 type SlotName = "frontHair" | "backHair" | "clothes";
 
@@ -40,9 +39,9 @@ type ClosetClientProps = {
 };
 
 const slotLabels: Record<SlotName, string> = {
+  clothes: "洋服",
   frontHair: "前髪",
   backHair: "後ろ髪",
-  clothes: "洋服",
 };
 
 const defaultOption = {
@@ -61,7 +60,6 @@ export function ClosetClient({
   const [selection, setSelection] =
     useState<Record<SlotName, string | null>>(initialSelection);
   const [activeTab, setActiveTab] = useState<SlotName>("frontHair");
-  const [isSaving, setIsSaving] = useState(false);
   const { moodKey, setHeraStatus } = useHera();
   const { setProfile } = useProfile();
   const router = useRouter();
@@ -88,7 +86,6 @@ export function ClosetClient({
   }), [selection, itemKeyMap, initialKeys]);
 
   const persistSelection = async (nextSelection: Record<SlotName, string | null>) => {
-    setIsSaving(true);
     try {
       const payload: UpdateAppearancePayload = {
         frontHairItemId: nextSelection.frontHair,
@@ -112,8 +109,6 @@ export function ClosetClient({
     } catch (error) {
       console.error("update appearance failed", error);
       toast.error("着せ替えの保存に失敗しました");
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -132,76 +127,48 @@ export function ClosetClient({
     const options: (ClosetItem & { id: string })[] = hasDefault
       ? items
       : [{ ...defaultOption, slot }, ...items];
+    const activeValue = selection[slot] ?? "default";
 
     return (
-      <>
-        <div className="grid grid-cols-2 gap-3">
-          {options.map((item) => {
-            const isDefaultOption =
-              item.key === "default" || item.id === "default";
-            const isActive =
-              (selection[slot] === null && isDefaultOption) ||
-              selection[slot] === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleSelect(slot, item.id)}
-                className={cn(
-                  "rounded-2xl border p-3 text-left transition-colors",
-                  isActive
-                    ? "border-pink-500 bg-pink-50"
-                    : "border-pink-100 hover:border-pink-300"
-                )}
-                aria-pressed={isActive}
-              >
-                <div className="text-sm font-semibold text-pink-700">
-                  {item.name}
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                  {item.description || "説明はありません"}
-                </p>
-              </button>
-            );
-          })}
+      <ScrollArea className="h-max">
+        <div className="pr-2">
+          <RadioGroup
+            value={activeValue}
+            onValueChange={(value) => handleSelect(slot, value)}
+          >
+            {options.map((item) => {
+              const isDefaultOption =
+                item.key === "default" || item.id === "default";
+              const value = isDefaultOption ? "default" : item.id;
+              return (
+                <label
+                  key={item.id}
+                  className="flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-2"
+                >
+                  <RadioGroupItem value={value} />
+                  <div>
+                    <div className="text-sm font-medium leading-none">{item.name}</div>
+                  </div>
+                </label>
+              );
+            })}
+          </RadioGroup>
+          {!items.length && (
+            <p className="text-center text-xs text-muted-foreground">
+              アイテムがありません。
+            </p>
+          )}
         </div>
-        {!items.length && (
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            まだ{slotLabels[slot]}アイテムを持っていません。ガチャやショップでゲットしてね。
-          </p>
-        )}
-      </>
+      </ScrollArea>
     );
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <Card>
-        <CardHeader>
-          <CardTitle>着せ替えプレビュー</CardTitle>
-          <CardDescription>選択しているスタイルがすぐに確認できます。</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col items-center gap-4">
-          <HeraPreview
-            appearance={previewAppearance}
-            moodKey={moodKey}
-            className="h-72 w-56"
-            sizes="220px"
-          />
-          <p className="text-xs text-muted-foreground">
-            着せ替えを保存するとホーム画面にも反映されます。
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>所持アイテム</CardTitle>
-          <CardDescription>スロットごとに装備するアイテムを選択できます。</CardDescription>
-        </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as SlotName)}>
-            <TabsList className="grid grid-cols-3 rounded-2xl bg-pink-50">
+            <TabsList className="grid grid-cols-3 w-full">
               {(Object.keys(slots) as SlotName[]).map((slot) => (
                 <TabsTrigger key={slot} value={slot}>
                   {slotLabels[slot]}
@@ -209,8 +176,16 @@ export function ClosetClient({
               ))}
             </TabsList>
             {(Object.keys(slots) as SlotName[]).map((slot) => (
-              <TabsContent key={slot} value={slot} className="mt-4">
+              <TabsContent key={slot} value={slot} className="mt-3 space-y-3">
                 {renderSlotContent(slot)}
+                <div className="flex justify-center">
+                  <HeraPreview
+                    appearance={previewAppearance}
+                    moodKey={moodKey}
+                    className="h-72 w-56"
+                    sizes="220px"
+                  />
+                </div>
               </TabsContent>
             ))}
           </Tabs>

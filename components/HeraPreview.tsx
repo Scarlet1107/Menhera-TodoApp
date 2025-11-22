@@ -32,7 +32,7 @@ export function HeraPreview({
   return (
     <div
       className={cn(
-        "relative h-64 w-full max-w-xs select-none overflow-hidden rounded-3xl bg-gradient-to-b from-white to-pink-50 shadow-inner",
+        "relative h-64 w-full max-w-xs select-none overflow-hidden rounded-3xl bg-linear-to-b from-white to-pink-50 shadow-inner",
         className
       )}
     >
