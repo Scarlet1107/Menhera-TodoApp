@@ -41,9 +41,6 @@ export const updateSession = async (request: NextRequest) => {
       return NextResponse.redirect(new URL("/protected/home", request.url));
     }
 
-    // // Set the pathname in the response headers for bottom navigation
-    // response.headers.set("x-pathname", request.nextUrl.pathname);
-
     return response;
   } catch (e) {
     const fallbackResponse = NextResponse.next({
