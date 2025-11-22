@@ -106,13 +106,22 @@ export default function Terms() {
 
             {/* 第11条 プライバシー */}
             <h2 className="text-2xl font-semibold mt-6">第11条（プライバシー）</h2>
-            <p className="text-base">運営者はユーザーの個人情報を以下の目的で収集・利用します。</p>
+            <p className="text-base">
+                運営者はユーザーの個人情報を、以下の目的のために収集・利用します。
+            </p>
             <ul className="list-disc list-inside space-y-2 text-base">
-                <li>アカウント登録および認証のため</li>
-                <li>本サービス提供および改善のため</li>
+                <li>アカウント登録、認証およびユーザー管理のため</li>
+                <li>本サービスの提供、改善、安定運用のため</li>
+                <li>ユーザーへの必要な連絡および通知（リマインドメール等を含む）のため</li>
                 <li>お問い合わせ対応のため</li>
             </ul>
-            <p className="text-base">取得した個人情報は第三者に提供せず、適切な安全管理措置を講じます。</p>
+            <p className="text-base mt-2">
+                リマインドメールなどの通知は、ユーザーが設定画面にて受信可否を選択できます。
+                また、各メールには配信停止リンクが含まれ、ユーザーはいつでも受信を停止できます。
+            </p>
+            <p className="text-base mt-2">
+                取得した個人情報は第三者に提供せず、適切な安全管理措置を講じます。
+            </p>
 
             {/* 第12条 規約変更 */}
             <h2 className="text-2xl font-semibold mt-6">第12条（規約変更）</h2>
