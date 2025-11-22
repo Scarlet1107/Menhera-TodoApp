@@ -71,9 +71,6 @@ export function ShopItemList({
         toast.error(result.message);
         return;
       }
-      toast.success("購入完了", {
-        description: `「${itemName}」を購入しました。`,
-      });
 
       if (typeof result.newBalance === "number") {
         setProfile({ menheraCoin: result.newBalance });
@@ -115,6 +112,7 @@ export function ShopItemList({
       {items.map((item) => {
         const isOwned = item.ownedQuantity > 0;
         const isLocked = item.isUnique && isOwned;
+        const isConsumable = item.category === "consumable";
         const previewMeta = getItemImageMeta(item);
         const hasPreview = Boolean(previewMeta?.show);
         const canAfford = typeof item.price === "number" && userBalance >= item.price;
@@ -177,8 +175,15 @@ export function ShopItemList({
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="text-sm text-pink-700">
-                  価格: {item.price != null ? `${formatPrice(item.price)} コイン` : "-"}
+                <div className="flex flex-col gap-1 text-sm text-pink-700">
+                  <div>
+                    価格: {item.price != null ? `${formatPrice(item.price)} コイン` : "-"}
+                  </div>
+                  {isConsumable && (
+                    <div className="text-xs text-muted-foreground">
+                      現在の所持数: {item.ownedQuantity}個
+                    </div>
+                  )}
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -203,7 +208,9 @@ export function ShopItemList({
                         <AlertDialogDescription>
                           {item.price != null ? formatPrice(item.price) : "-"}メンヘラコインを消費して購入します。
                           <br />
-                          購入後すぐにクローゼットで着替えられます。
+                          {isConsumable
+                            ? "購入すると所持数に追加されます。"
+                            : "購入後すぐにクローゼットで着替えられます。"}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

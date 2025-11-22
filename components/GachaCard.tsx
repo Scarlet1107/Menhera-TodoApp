@@ -90,11 +90,6 @@ export function GachaCard({ drawGachaAction }: GachaCardProps) {
         toast.error(result.message);
         return;
       }
-
-      toast.success("ガチャ結果", {
-        description: `「${result.item.name}」を獲得しました！`,
-      });
-
       if (typeof result.newBalance === "number") {
         setProfile({ menheraCoin: result.newBalance });
       }
@@ -139,7 +134,7 @@ export function GachaCard({ drawGachaAction }: GachaCardProps) {
   };
 
   return (
-    <Card className="border-pink-200 bg-linear-to-br from-pink-50 to-white shadow-inner">
+    <Card>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 space-y-1">

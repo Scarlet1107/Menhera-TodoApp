@@ -42,8 +42,8 @@ export const NotificationPopover = () => {
         if (updateError) throw updateError;
 
         // setNotificationsを使用して既読状態を更新
-        setNotifications(prev =>
-          prev.map(n =>
+        setNotifications((prev) =>
+          prev.map((n) =>
             idsToMark.includes(n.id) ? { ...n, isRead: true } : n
           )
         );
@@ -68,29 +68,33 @@ export const NotificationPopover = () => {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-48 md:w-60 lg:w-80 rounded-2xl p-0">
-        <Card className="border-pink-200">
+        <Card className="border-pink-200 dark:border-pink-800">
           <CardHeader>
-            <CardTitle className="text-gray-800 dark:text-gray-200">通知</CardTitle>
+            <CardTitle className="text-gray-800 dark:text-gray-200">
+              通知
+            </CardTitle>
           </CardHeader>
-          <Separator className="bg-pink-200 -my-2" />
+          <Separator className="bg-pink-200 dark:bg-pink-800 -my-2" />
           <CardContent className="p-0">
             <ScrollArea className="h-64">
               <ul>
                 {notifications.length === 0 && (
-                  <li className="p-4 text-center text-sm text-pink-500">
+                  <li className="p-4 text-center text-sm text-pink-500 dark:text-pink-400">
                     通知はありません
                   </li>
                 )}
                 {notifications.map((note) => (
                   <li
                     key={note.id}
-                    className={`flex cursor-pointer flex-col border-b border-pink-200 p-4 last:border-none hover:bg-pink-50 ${!note.isRead ? "bg-pink-100 font-semibold" : ""
+                    className={`flex cursor-pointer flex-col border-b border-pink-200 dark:border-pink-800 p-4 last:border-none hover:bg-pink-50 dark:hover:bg-pink-950 ${!note.isRead
+                        ? "bg-pink-100 dark:bg-pink-900 font-semibold"
+                        : ""
                       }`}
                   >
-                    <span className="text-sm whitespace-pre-wrap text-pink-800">
+                    <span className="text-sm whitespace-pre-wrap text-pink-800 dark:text-pink-200">
                       {note.content}
                     </span>
-                    <time className="mt-1 text-xs text-pink-500">
+                    <time className="mt-1 text-xs text-pink-500 dark:text-pink-400">
                       {formatRelativeTime(note.createdAt)}
                     </time>
                   </li>

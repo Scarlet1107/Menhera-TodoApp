@@ -42,8 +42,9 @@ export default async function Page() {
       itemRows
         ?.filter(
           (item) =>
-            item.image_filename !== "default" &&
-            item.price !== null
+            item.price !== null &&
+            // コスメはプレビュー付きのみ、消費アイテムはプレビューなしでも表示
+            (item.category === "consumable" || item.image_filename !== "default")
         )
         .map((item) => ({
           id: item.id,

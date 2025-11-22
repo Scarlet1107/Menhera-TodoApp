@@ -100,7 +100,6 @@ export function ClosetClient({
         toast.error(result.message);
         return;
       }
-      toast.success("着せ替えを更新しました");
       setHeraStatus({
         appearance: result.appearance,
       });
